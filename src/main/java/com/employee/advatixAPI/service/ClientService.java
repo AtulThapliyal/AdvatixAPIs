@@ -64,4 +64,23 @@ public class ClientService {
 
         System.out.println(clientInfo);
     }
+
+    public String editClientDetails(ClientInfo clientDetails) {
+
+        Optional<ClientInfo> client = clientRepository.getClientByClientId(clientDetails.getClientId());
+        if(client.isPresent()){
+            client.get().setClientEmail(clientDetails.getClientEmail());
+            client.get().setClientName(clientDetails.getClientName());
+            client.get().setClientPhone(clientDetails.getClientPhone());
+            client.get().setAddress(clientDetails.getAddress());
+            client.get().setCityId(clientDetails.getCityId());
+            client.get().setStateId(clientDetails.getStateId());
+            client.get().setCountryId(clientDetails.getCountryId());
+        }
+
+        clientRepository.save(client.get());
+        System.out.println(client);
+
+        return "Success";
+    }
 }

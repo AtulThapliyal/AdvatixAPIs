@@ -28,4 +28,9 @@ public class ClientController
 
         return new ResponseEntity("Client has been added", HttpStatus.OK);
     }
+
+    @PutMapping("/editClient")
+    public String editClientDetails(@RequestBody ClientInfo clientDetails){
+        return clientService.editClientDetails(clientDetails);
+    }
 }

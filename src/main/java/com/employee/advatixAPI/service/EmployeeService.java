@@ -37,24 +37,10 @@ public class EmployeeService {
         return employeeRepository.findAll();
     }
 
-    public String addEmployee(EmployeeEntity employee) {
-//
-//        RolesEntity rs = employee.getRoles();
-//        Permissions permissions=rs.getPermissions();
-//        rs.setEmp(employee);
-//        employee.setRoles(rs);
-//        rs.setPermissions(permissions);
-//        permissions.setRole(rs);
-//        employeeRepository.save(employee);
-//        return employee.getName();
-        return "";
-    }
-
     public String deleteEmployee(int employeeId) {
         if (employeeRepository.findById(employeeId).isPresent()) {
             employeeRepository.delete(employeeRepository.findById(employeeId).get());
         }
-        ;
         return "Successfully deleted";
     }
 
@@ -69,8 +55,8 @@ public class EmployeeService {
                 RolesEntity role = roleRepository.getRoleByRoleId(user.get().getRoleId());
                 List<ClientInfo> clients = clientRepository.findClientsByEmployeeId(user.get().getId());
 
-                List<Permissions> permissions  = permissionRepository.getPermissionByRoleId(role.getRoleId());
-                if (user.isPresent() ) {
+                List<Permissions> permissions = permissionRepository.getPermissionByRoleId(role.getRoleId());
+                if (user.isPresent()) {
                     EmployeeResponse employeeResponse = new EmployeeResponse();
                     employeeResponse.setPermissions(permissions);
                     employeeResponse.setRoles(role);
@@ -87,7 +73,7 @@ public class EmployeeService {
         return new LoginMessage("User is not registered", false, null);
     }
 
-    public String create(EmployeeEntity employee){
+    public String create(EmployeeEntity employee) {
 
         employeeRepository.save(employee);
         return "";
@@ -96,13 +82,13 @@ public class EmployeeService {
     public EmployeeResponse getEmployeeById(Integer id) {
         Optional<EmployeeEntity> emp = employeeRepository.findById(id);
         EmployeeResponse employeeResponse = new EmployeeResponse();
-        if(emp.isPresent()){
+        if (emp.isPresent()) {
             employeeResponse.setEmployee(emp.get());
             RolesEntity role = roleRepository.getRoleByRoleId(emp.get().getRoleId());
             employeeResponse.setRoles(role);
             List<Permissions> permissions = permissionRepository.getPermissionByRoleId(role.getRoleId());
             employeeResponse.setPermissions(permissions);
-        return  employeeResponse;
+            return employeeResponse;
 
         }
         return null;
