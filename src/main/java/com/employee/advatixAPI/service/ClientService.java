@@ -60,6 +60,8 @@ public class ClientService {
             throw new NotFoundException("City with id " + clientInfo.getCityId() + " not found");
         }
 
+        clientRepository.save(clientInfo);
+
         System.out.println(clientInfo);
     }
 }

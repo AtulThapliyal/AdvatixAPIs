@@ -1,5 +1,6 @@
 package com.employee.advatixAPI.dto;
 
+import com.employee.advatixAPI.entity.Client.ClientInfo;
 import com.employee.advatixAPI.entity.EmployeeEntity;
 import com.employee.advatixAPI.entity.Permissions;
 import com.employee.advatixAPI.entity.RolesEntity;
@@ -12,4 +13,5 @@ public class EmployeeResponse {
     private EmployeeEntity employee;
     private RolesEntity roles;
     private List<Permissions> permissions;
+    private List<ClientInfo> clientInfos;
 }

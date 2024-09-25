@@ -27,4 +27,6 @@ public class ClientInfo {
 
     //zip code
     private String zipCode;
+
+    private Integer employeeId;
 }

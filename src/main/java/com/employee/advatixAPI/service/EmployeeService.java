@@ -1,9 +1,11 @@
 package com.employee.advatixAPI.service;
 
 import com.employee.advatixAPI.dto.*;
+import com.employee.advatixAPI.entity.Client.ClientInfo;
 import com.employee.advatixAPI.entity.EmployeeEntity;
 import com.employee.advatixAPI.entity.Permissions;
 import com.employee.advatixAPI.entity.RolesEntity;
+import com.employee.advatixAPI.repository.ClientRepo.ClientRepository;
 import com.employee.advatixAPI.repository.EmployeeRepository;
 import com.employee.advatixAPI.repository.PermissionRepository;
 import com.employee.advatixAPI.repository.RolesRepository;
@@ -26,6 +28,9 @@ public class EmployeeService {
 
     @Autowired
     private PermissionRepository permissionRepository;
+
+    @Autowired
+    private ClientRepository clientRepository;
 
 
     public List<EmployeeEntity> getAllEmployees() {
@@ -62,6 +67,7 @@ public class EmployeeService {
             if (password.equals(encodedPassword)) {
                 Optional<EmployeeEntity> user = employeeRepository.findOneByEmailAndPassword(loginCredential.getEmail(), encodedPassword);
                 RolesEntity role = roleRepository.getRoleByRoleId(user.get().getRoleId());
+                List<ClientInfo> clients = clientRepository.findClientsByEmployeeId(user.get().getId());
 
                 List<Permissions> permissions  = permissionRepository.getPermissionByRoleId(role.getRoleId());
                 if (user.isPresent() ) {
@@ -69,6 +75,7 @@ public class EmployeeService {
                     employeeResponse.setPermissions(permissions);
                     employeeResponse.setRoles(role);
                     employeeResponse.setEmployee(employee);
+                    employeeResponse.setClientInfos(clients);
                     return new LoginMessage("Login Success", true, employeeResponse);
                 } else {
                     return new LoginMessage("Login Failure", false, null);
