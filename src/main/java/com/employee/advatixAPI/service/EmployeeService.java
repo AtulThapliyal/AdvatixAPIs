@@ -91,10 +91,13 @@ public class EmployeeService {
         EmployeeResponse employeeResponse = new EmployeeResponse();
         if(emp.isPresent()){
             employeeResponse.setEmployee(emp.get());
-//            employeeResponse.setRoles(emp.get().getRole());
-//            employeeResponse.setPermissions(emp.get().getRole().getPermissions());
+            RolesEntity role = roleRepository.getRoleByRoleId(emp.get().getRoleId());
+            employeeResponse.setRoles(role);
+            List<Permissions> permissions = permissionRepository.getPermissionByRoleId(role.getRoleId());
+            employeeResponse.setPermissions(permissions);
+        return  employeeResponse;
 
         }
-        return  employeeResponse;
+        return null;
     }
 }

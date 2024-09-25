@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository;
 public interface StateRepository extends JpaRepository<States, Integer> {
 
     States getStateByStateIdAndCountryId(Integer stateId, Integer countryId);
+
+    States getStatesByStateId(Integer stateId);
 }

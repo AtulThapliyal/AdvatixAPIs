@@ -5,6 +5,7 @@ import com.employee.advatixAPI.entity.Client.City;
 import com.employee.advatixAPI.entity.Client.ClientInfo;
 import com.employee.advatixAPI.entity.Client.Country;
 import com.employee.advatixAPI.entity.Client.States;
+import com.employee.advatixAPI.exception.NotFoundException;
 import com.employee.advatixAPI.repository.ClientRepo.CityRepository;
 import com.employee.advatixAPI.repository.ClientRepo.ClientRepository;
 import com.employee.advatixAPI.repository.ClientRepo.CountryRepository;
@@ -45,5 +46,20 @@ public class ClientService {
             return clientResponse;
         }
         return null;
+    }
+
+    public void createClient(ClientInfo clientInfo) {
+
+        if(countryRepository.getCountryByCountryId(clientInfo.getCountryId()) == null){
+            throw new NotFoundException("Country with id " + clientInfo.getCountryId() + " not found");
+        }
+        if(stateRepository.getStatesByStateId(clientInfo.getStateId()) == null){
+            throw new NotFoundException("State with id " + clientInfo.getStateId() + " not found");
+        }
+        if (cityRepository.getCityByCityId(clientInfo.getCityId()) == null) {
+            throw new NotFoundException("City with id " + clientInfo.getCityId() + " not found");
+        }
+
+        System.out.println(clientInfo);
     }
 }
