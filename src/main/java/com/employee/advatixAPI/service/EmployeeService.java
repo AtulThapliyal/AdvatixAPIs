@@ -53,14 +53,14 @@ public class EmployeeService {
             if (password.equals(encodedPassword)) {
                 Optional<EmployeeEntity> user = employeeRepository.findOneByEmailAndPassword(loginCredential.getEmail(), encodedPassword);
                 RolesEntity role = roleRepository.getRoleByRoleId(user.get().getRoleId());
-                List<ClientInfo> clients = clientRepository.findClientsByEmployeeId(user.get().getId());
+                List<ClientInfo> clients = clientRepository.findAllByEmployeeId(user.get().getId());
 
                 List<Permissions> permissions = permissionRepository.getPermissionByRoleId(role.getRoleId());
                 if (user.isPresent()) {
                     EmployeeResponse employeeResponse = new EmployeeResponse();
-                    employeeResponse.setPermissions(permissions);
-                    employeeResponse.setRoles(role);
                     employeeResponse.setEmployee(employee);
+                    employeeResponse.setRoles(role);
+                    employeeResponse.setPermissions(permissions);
                     employeeResponse.setClientInfos(clients);
                     return new LoginMessage("Login Success", true, employeeResponse);
                 } else {
@@ -88,6 +88,10 @@ public class EmployeeService {
             employeeResponse.setRoles(role);
             List<Permissions> permissions = permissionRepository.getPermissionByRoleId(role.getRoleId());
             employeeResponse.setPermissions(permissions);
+
+            List<ClientInfo> clients = clientRepository.findAllByEmployeeId(emp.get().getId());
+            employeeResponse.setClientInfos(clients);
+
             return employeeResponse;
 
         }
