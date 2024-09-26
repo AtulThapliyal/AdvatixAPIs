@@ -1,5 +1,6 @@
 package com.employee.advatixAPI.service.product;
 
+import com.employee.advatixAPI.dto.ProductRequestDTO;
 import com.employee.advatixAPI.dto.ProductResponse;
 import com.employee.advatixAPI.entity.Product.Product;
 import com.employee.advatixAPI.entity.Product.ProductAttribute;
@@ -38,5 +39,31 @@ public class ProductService {
             return productResponse;
         }
         return null;
+    }
+
+    public Product saveProductWithAttributes(ProductRequestDTO productRequestDTO) {
+
+        System.out.println(productRequestDTO);
+        Product savedProduct = productRepository.save(productRequestDTO.getProduct());
+        for (ProductAttribute attributes : productRequestDTO.getProductAttributes()) {
+            attributes.setProductId(savedProduct.getProductId());
+            productAttributeRepository.save(attributes);
+        }
+
+        return  savedProduct;
+    }
+
+    public List<Product> getProductsByFilter(String sku, Integer clientId, Integer createdBy) {
+
+        if(sku != null && clientId != null){
+            return productRepository.findAllByProductSkuAndClientId(sku, clientId);
+        }
+        if(sku != null && createdBy != null){
+            return productRepository.findAllByProductSkuAndCreatedBy(sku, createdBy);
+        }
+        if(clientId != null && createdBy != null){
+            return productRepository.findAllByClientIdAndCreatedBy(clientId, createdBy);
+        }
+            return productRepository.findAllByProductSkuOrClientIdOrCreatedBy(sku, clientId, createdBy);
     }
 }

@@ -1,14 +1,13 @@
 package com.employee.advatixAPI.controller.product;
 
+import com.employee.advatixAPI.dto.ProductRequestDTO;
 import com.employee.advatixAPI.dto.ProductResponse;
 import com.employee.advatixAPI.entity.Product.Product;
 import com.employee.advatixAPI.service.product.ProductService;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -27,5 +26,17 @@ public class ProductController {
     @GetMapping("/getProduct/{productId}")
     public ProductResponse getProductById(@PathVariable Integer productId){
         return productService.getProductById(productId);
+    }
+
+    @PostMapping("/addProduct")
+    public String createProduct(@RequestBody ProductRequestDTO product){
+
+        productService.saveProductWithAttributes(product);
+        return "";
+    }
+
+    @GetMapping("/getProducts")
+    public List<Product> getProductsByFilter( @RequestParam(required = false) String sku, @RequestParam(required = false) Integer clientId, @RequestParam(required = false) Integer createdBy){
+        return productService.getProductsByFilter(sku, clientId, createdBy);
     }
 }

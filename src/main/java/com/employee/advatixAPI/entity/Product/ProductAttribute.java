@@ -10,7 +10,7 @@ import lombok.Data;
 @Data
 public class ProductAttribute {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer productAttributeInfoId;
     private Integer productId;
     private Integer attributeId;
