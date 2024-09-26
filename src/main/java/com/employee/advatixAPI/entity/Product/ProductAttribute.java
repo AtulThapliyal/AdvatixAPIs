@@ -8,7 +8,8 @@ import lombok.Data;
 
 @Entity
 @Data
-public class ProductAttribute {
+public class
+ProductAttribute {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer productAttributeInfoId;

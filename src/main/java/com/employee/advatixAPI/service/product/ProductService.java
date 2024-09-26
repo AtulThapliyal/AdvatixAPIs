@@ -1,14 +1,19 @@
 package com.employee.advatixAPI.service.product;
 
+import com.employee.advatixAPI.dto.AttributeInProduct;
 import com.employee.advatixAPI.dto.ProductRequestDTO;
 import com.employee.advatixAPI.dto.ProductResponse;
+import com.employee.advatixAPI.entity.Product.Attributes;
 import com.employee.advatixAPI.entity.Product.Product;
 import com.employee.advatixAPI.entity.Product.ProductAttribute;
+import com.employee.advatixAPI.repository.product.AttributeRepository;
 import com.employee.advatixAPI.repository.product.ProductAttributeRepository;
 import com.employee.advatixAPI.repository.product.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,6 +26,9 @@ public class ProductService {
 
     @Autowired
     ProductAttributeRepository productAttributeRepository;
+
+    @Autowired
+    AttributeRepository attributeRepository;
 
     public List<Product> getAllProducts() {
 
@@ -35,7 +43,22 @@ public class ProductService {
         if(product.isPresent()){
             productResponse.setProduct(product.get());
             List<ProductAttribute> productAttributes = productAttributeRepository.findAllByProductId(productId);
-            productResponse.setProductAttributes(productAttributes);
+            HashMap<Integer, String> attributeMap = new HashMap<>();
+            List<Attributes> attributes = attributeRepository.findAll();
+
+            List<AttributeInProduct> attributesOfProduct = new ArrayList<>();
+
+            attributes.forEach(attribute -> {
+                attributeMap.put(attribute.getAttributeId(), attribute.getAttributeDesc());
+            });
+
+
+            productAttributes.forEach(productAttribute -> {
+                String attribute = attributeMap.get(productAttribute.getAttributeId());
+                attributesOfProduct.add(new AttributeInProduct(productAttribute.getProductId(), productAttribute.getAttributeDesc(), attribute));
+            });
+
+            productResponse.setProductAttributes(attributesOfProduct);
             return productResponse;
         }
         return null;
@@ -64,6 +87,6 @@ public class ProductService {
         if(clientId != null && createdBy != null){
             return productRepository.findAllByClientIdAndCreatedBy(clientId, createdBy);
         }
-            return productRepository.findAllByProductSkuOrClientIdOrCreatedBy(sku, clientId, createdBy);
+        return productRepository.findAllByProductSkuOrClientIdOrCreatedBy(sku, clientId, createdBy);
     }
 }

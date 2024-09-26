@@ -9,5 +9,5 @@ import java.util.List;
 @Data
 public class ProductResponse {
     private Product product;
-    private List<ProductAttribute> productAttributes;
+    private List<AttributeInProduct> productAttributes;
 }
