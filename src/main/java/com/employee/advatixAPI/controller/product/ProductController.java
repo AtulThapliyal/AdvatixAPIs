@@ -3,6 +3,8 @@ package com.employee.advatixAPI.controller.product;
 import com.employee.advatixAPI.dto.ProductRequestDTO;
 import com.employee.advatixAPI.dto.ProductResponse;
 import com.employee.advatixAPI.entity.Product.Product;
+import com.employee.advatixAPI.entity.joinsEntity.ProductsJoinsEntity;
+import com.employee.advatixAPI.repository.JoinsRepository.ProductJoinsRepository;
 import com.employee.advatixAPI.service.product.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -38,5 +40,12 @@ public class ProductController {
     @GetMapping("/getProducts")
     public List<Product> getProductsByFilter( @RequestParam(required = false) String sku, @RequestParam(required = false) Integer clientId, @RequestParam(required = false) Integer createdBy){
         return productService.getProductsByFilter(sku, clientId, createdBy);
+    }
+
+
+
+    @PostMapping("/add/addJoinsProduct")
+    public ProductsJoinsEntity addProductUsingJoins(@RequestBody ProductsJoinsEntity product){
+        return productService.saveProductInJoins(product);
     }
 }

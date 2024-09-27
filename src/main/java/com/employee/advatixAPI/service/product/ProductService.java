@@ -6,6 +6,8 @@ import com.employee.advatixAPI.dto.ProductResponse;
 import com.employee.advatixAPI.entity.Product.Attributes;
 import com.employee.advatixAPI.entity.Product.Product;
 import com.employee.advatixAPI.entity.Product.ProductAttribute;
+import com.employee.advatixAPI.entity.joinsEntity.ProductsJoinsEntity;
+import com.employee.advatixAPI.repository.JoinsRepository.ProductJoinsRepository;
 import com.employee.advatixAPI.repository.product.AttributeRepository;
 import com.employee.advatixAPI.repository.product.ProductAttributeRepository;
 import com.employee.advatixAPI.repository.product.ProductRepository;
@@ -29,6 +31,11 @@ public class ProductService {
 
     @Autowired
     AttributeRepository attributeRepository;
+
+
+    @Autowired
+    ProductJoinsRepository productJoinsRepository;
+
 
     public List<Product> getAllProducts() {
 
@@ -88,5 +95,11 @@ public class ProductService {
             return productRepository.findAllByClientIdAndCreatedBy(clientId, createdBy);
         }
         return productRepository.findAllByProductSkuOrClientIdOrCreatedBy(sku, clientId, createdBy);
+    }
+
+    public ProductsJoinsEntity saveProductInJoins(ProductsJoinsEntity product) {
+
+        ProductsJoinsEntity savedProduct = productJoinsRepository.save(product);
+        return  savedProduct;
     }
 }
