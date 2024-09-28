@@ -1,12 +1,11 @@
 package com.employee.advatixAPI.entity.joinsEntity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import lombok.Data;
 
 @Entity
 @Table(name = "attribute_master_table")
+@Data
 public class AttributeJoin {
 
     @Id
