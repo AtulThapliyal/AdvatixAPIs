@@ -1,6 +1,7 @@
 package com.employee.advatixAPI.entity.joinsEntity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Entity
@@ -16,6 +17,11 @@ public class ProductAttributesJoinsEntity {
 
 //    @ManyToOne(cascade = CascadeType.ALL)
 //    @JoinColumn(name = "attribute_id")
+
+    public ProductAttributesJoinsEntity(String attributeDescription, AttributeJoin attribute) {
+        this.attributeDescription = attributeDescription;
+        this.attribute = attribute;
+    }
 //    private Integer attribute;
 
     @ManyToOne

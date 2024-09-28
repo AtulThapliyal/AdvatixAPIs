@@ -6,5 +6,4 @@ import lombok.Data;
 public class AttributeDTO {
     private String attributeDescription;
     private Integer attributeId;
-    private Integer productId;
 }
