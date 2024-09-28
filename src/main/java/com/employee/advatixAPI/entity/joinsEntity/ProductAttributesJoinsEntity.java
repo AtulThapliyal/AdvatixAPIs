@@ -3,10 +3,13 @@ package com.employee.advatixAPI.entity.joinsEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Data
 @Table(name = "attribute_join")
+@NoArgsConstructor
+@AllArgsConstructor
 public class ProductAttributesJoinsEntity {
 
     @Id

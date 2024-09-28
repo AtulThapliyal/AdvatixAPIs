@@ -4,7 +4,9 @@ import com.employee.advatixAPI.dto.AttributeInProduct;
 import com.employee.advatixAPI.dto.ProductRequestDTO;
 import com.employee.advatixAPI.dto.ProductResponse;
 import com.employee.advatixAPI.dto.product_joins.AttributeDTO;
+import com.employee.advatixAPI.dto.product_joins.AttributeResponse;
 import com.employee.advatixAPI.dto.product_joins.ProductDTO;
+import com.employee.advatixAPI.dto.product_joins.ProductJoinsResponse;
 import com.employee.advatixAPI.entity.Product.Attributes;
 import com.employee.advatixAPI.entity.Product.Product;
 import com.employee.advatixAPI.entity.Product.ProductAttribute;
@@ -13,6 +15,7 @@ import com.employee.advatixAPI.entity.joinsEntity.ProductAttributesJoinsEntity;
 import com.employee.advatixAPI.entity.joinsEntity.ProductsJoinsEntity;
 import com.employee.advatixAPI.exception.NotFoundException;
 import com.employee.advatixAPI.repository.JoinsRepository.AttributeJoinsRepository;
+import com.employee.advatixAPI.repository.JoinsRepository.ProductAttributesJoinRepository;
 import com.employee.advatixAPI.repository.JoinsRepository.ProductJoinsRepository;
 import com.employee.advatixAPI.repository.product.AttributeRepository;
 import com.employee.advatixAPI.repository.product.ProductAttributeRepository;
@@ -45,6 +48,9 @@ public class ProductService {
 
     @Autowired
     AttributeJoinsRepository attributeJoinsRepository;
+
+    @Autowired
+    ProductAttributesJoinRepository productAttributesJoinRepository;
 
 
 
@@ -125,15 +131,25 @@ public class ProductService {
         (attributeDTO ->
         new ProductAttributesJoinsEntity(attributeDTO.getAttributeDescription(), attributeJoinsRepository.findById(attributeDTO.getAttributeId()).get())
         ).collect(Collectors.toList()));
-        ProductsJoinsEntity savedProduct = productJoinsRepository.save(productsJoins);
-
-        System.out.println(productsJoins);
-//        Product savedProduct = productRepository.save(product);
-//
-//
-//
-//        ProductsJoinsEntity savedProduct = productJoinsRepository.save(product);
-//        return  savedProduct;
         return productsJoins;
+    }
+
+    public ProductJoinsResponse getProduct(Integer productId) {
+
+        ProductsJoinsEntity productsJoins = productJoinsRepository.findById(productId).get();
+        List<ProductAttributesJoinsEntity> productAttributes = productAttributesJoinRepository.findAllByProductId(productId);
+
+        ProductJoinsResponse productDTO = new ProductJoinsResponse();
+
+        List<AttributeResponse> attributesOfProduct = new ArrayList<>();
+        productAttributes.forEach(productAttribute -> {
+            attributesOfProduct.add(new AttributeResponse(productAttribute.getAttribute().getAttributeId(), productAttribute.getAttribute().getAttributeName(), productAttribute.getAttributeDescription()));
+        });
+
+        productDTO.setProductName(productsJoins.getProductName());
+        productDTO.setProductSku(productsJoins.getProductSku());
+
+        productDTO.setAttributes(attributesOfProduct);
+        return productDTO;
     }
 }

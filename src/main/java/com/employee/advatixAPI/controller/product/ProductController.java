@@ -3,6 +3,7 @@ package com.employee.advatixAPI.controller.product;
 import com.employee.advatixAPI.dto.ProductRequestDTO;
 import com.employee.advatixAPI.dto.ProductResponse;
 import com.employee.advatixAPI.dto.product_joins.ProductDTO;
+import com.employee.advatixAPI.dto.product_joins.ProductJoinsResponse;
 import com.employee.advatixAPI.entity.Product.Product;
 import com.employee.advatixAPI.entity.joinsEntity.ProductsJoinsEntity;
 import com.employee.advatixAPI.repository.JoinsRepository.ProductJoinsRepository;
@@ -49,8 +50,8 @@ public class ProductController {
     public ProductsJoinsEntity addProductUsingJoins(@RequestBody ProductDTO product){
         return productService.saveProductInJoins(product);
     }
-//    @GetMapping("/getJoinedProduct/{productId}")
-//    public ProductsJoinsEntity getJoinedProduct(@PathVariable Integer productId){
-//        return productService.getProduct(productId);
-//    }
+    @GetMapping("/getJoinedProduct/{productId}")
+    public ProductJoinsResponse getJoinedProduct(@PathVariable Integer productId){
+        return productService.getProduct(productId);
+    }
 }
