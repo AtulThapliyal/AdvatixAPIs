@@ -12,5 +12,6 @@ public class ASNNoticeRequestDto {
     private Integer totalQuantity;
     private LocalDate createdOn;
     private Integer createdBy;
+    private Integer warehouseId;
     private List<ASNUnitRequest> asnUnitList;
 }
