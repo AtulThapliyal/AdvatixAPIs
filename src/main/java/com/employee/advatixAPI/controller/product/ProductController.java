@@ -1,12 +1,10 @@
 package com.employee.advatixAPI.controller.product;
 
-import com.employee.advatixAPI.dto.ProductRequestDTO;
-import com.employee.advatixAPI.dto.ProductResponse;
+import com.employee.advatixAPI.dto.productsDto.ProductRequestDTO;
+import com.employee.advatixAPI.dto.productsDto.ProductResponse;
 import com.employee.advatixAPI.entity.Product.Product;
 import com.employee.advatixAPI.service.product.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

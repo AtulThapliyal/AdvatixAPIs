@@ -1,7 +1,6 @@
-package com.employee.advatixAPI.dto;
+package com.employee.advatixAPI.dto.productsDto;
 
 import com.employee.advatixAPI.entity.Product.Product;
-import com.employee.advatixAPI.entity.Product.ProductAttribute;
 import lombok.Data;
 
 import java.util.List;

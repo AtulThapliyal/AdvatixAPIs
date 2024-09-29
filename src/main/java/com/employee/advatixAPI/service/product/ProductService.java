@@ -1,8 +1,8 @@
 package com.employee.advatixAPI.service.product;
 
-import com.employee.advatixAPI.dto.AttributeInProduct;
-import com.employee.advatixAPI.dto.ProductRequestDTO;
-import com.employee.advatixAPI.dto.ProductResponse;
+import com.employee.advatixAPI.dto.productsDto.AttributeInProduct;
+import com.employee.advatixAPI.dto.productsDto.ProductRequestDTO;
+import com.employee.advatixAPI.dto.productsDto.ProductResponse;
 import com.employee.advatixAPI.entity.Product.Attributes;
 import com.employee.advatixAPI.entity.Product.Product;
 import com.employee.advatixAPI.entity.Product.ProductAttribute;

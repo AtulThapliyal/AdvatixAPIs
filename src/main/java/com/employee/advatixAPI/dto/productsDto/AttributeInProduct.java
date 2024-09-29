@@ -1,6 +1,5 @@
-package com.employee.advatixAPI.dto;
+package com.employee.advatixAPI.dto.productsDto;
 
-import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
