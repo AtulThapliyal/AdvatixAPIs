@@ -39,7 +39,7 @@ public class ASNService {
 
     public ASNNotice addASN(ASNNoticeRequestDto asnNoticeRequest) {
         ASNNotice asnNotice = new ASNNotice();
-        WarehouseReceivedItems warehouseReceivedItems = new WarehouseReceivedItems();
+//        WarehouseReceivedItems warehouseReceivedItems = new WarehouseReceivedItems();
 
         asnNotice.setPoNumber(asnNoticeRequest.getPoNumber());
         asnNotice.setLotNumber(asnNoticeRequest.getLotNumber());
@@ -49,9 +49,12 @@ public class ASNService {
 
 
         List<ASNUnits> asnUnitsList = new ArrayList<>();
+        List<WarehouseReceivedItems> warehouseReceivedItemsList = new ArrayList<>();
         for (ASNUnitRequest asnUnit : asnNoticeRequest.getAsnUnitList()) {
             ASNUnits unit = new ASNUnits(asnUnit.getQuantity(), asnUnit.getReceivedQuantity(), asnUnit.getLocation(), productRepository.findByProductId(asnUnit.getProductId()).get());
             asnUnitsList.add(unit);
+
+            WarehouseReceivedItems warehouseReceivedItems = new WarehouseReceivedItems();
 
             warehouseReceivedItems.setWarehouseId(asnNoticeRequest.getWarehouseId());
             warehouseReceivedItems.setLocation(asnUnit.getLocation());
