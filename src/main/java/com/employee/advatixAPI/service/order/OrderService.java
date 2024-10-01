@@ -67,9 +67,15 @@ public class OrderService {
         for (int i = 0 ;i < orderInfo.getOrderItemsList().size();i++){
             CILOrderItems cilOrderItem = orderInfo.getOrderItemsList().get(i);
             fepOrderItemsList.add(new FEPOrderItems(cilOrderItem.getProductId(), cilOrderItem.getProductQty()));
-            WarehouseReceivedItems item = warehouseRepository.findByProductId(cilOrderItem.getProductId());
+
+            //getting the data one by one
+//            WarehouseReceivedItems item = warehouseRepository.findByProductId(cilOrderItem.getProductId());
+//            item.setQuantity(item.getQuantity() - cilOrderItem.getProductQty());
+
+            //getting data from hashmap and saving it in database
+            WarehouseReceivedItems item = itemsHashMap.get(cilOrderItem.getProductId()) ;
             item.setQuantity(item.getQuantity() - cilOrderItem.getProductQty());
-//            itemsHashMap.get()
+            warehouseRepository.updateQuantityByProductId(item.getQuantity(), item.getProductId());
 
         }
 
