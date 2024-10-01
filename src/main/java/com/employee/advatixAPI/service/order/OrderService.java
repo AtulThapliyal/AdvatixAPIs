@@ -66,9 +66,11 @@ public class OrderService {
         // logic for reducing the quantity from the database for the particular item
         for (int i = 0 ;i < orderInfo.getOrderItemsList().size();i++){
             CILOrderItems cilOrderItem = orderInfo.getOrderItemsList().get(i);
-            fepOrderItemsList.add(new FEPOrderItems(cilOrderItem.getProductQty(), cilOrderItem.getProductQty()));
+            fepOrderItemsList.add(new FEPOrderItems(cilOrderItem.getProductId(), cilOrderItem.getProductQty()));
             WarehouseReceivedItems item = warehouseRepository.findByProductId(cilOrderItem.getProductId());
             item.setQuantity(item.getQuantity() - cilOrderItem.getProductQty());
+//            itemsHashMap.get()
+
         }
 
 
