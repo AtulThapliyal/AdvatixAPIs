@@ -32,7 +32,6 @@ public class OrderService {
 
     public ResponseEntity<?> generateOrder(CILOrderInfo orderInfo) {
         //first save the order in cil layer
-        CILOrderInfo cilOrder = cilOrderRepository.save(orderInfo);
 
         //make a array list to save product Id to get from data at one using In query
         List<Integer> productIds = new ArrayList<>();
@@ -47,6 +46,7 @@ public class OrderService {
         warehouseReceivedItems.forEach(item -> itemsHashMap.put(item.getProductId(), item));
 
         //check for the validation in any product and donot save it in fep if order can not be fulfilled
+        CILOrderInfo cilOrder = cilOrderRepository.save(orderInfo);
         for (CILOrderItems cilOrderItem : orderInfo.getOrderItemsList()) {
             if (cilOrderItem.getProductQty() <= 0) {
                 throw new NotFoundException("Product with id  " + cilOrderItem.getProductId() + "can not be zero.");
@@ -83,7 +83,7 @@ public class OrderService {
         //set the order list in fep
         fepOrderInfo.setOrderItemsList(fepOrderItemsList);
 
-        //save the order in fep as the warehouse has the ability or have sudfficient products to fulfil the order.
+        //save the order in fep as the warehouse has the ability or have sufficient products to fulfil the order.
         fepOrderRepository.save(fepOrderInfo);
 
         return null;
