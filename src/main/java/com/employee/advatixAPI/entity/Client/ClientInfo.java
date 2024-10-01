@@ -29,4 +29,6 @@ public class ClientInfo {
     private String zipCode;
 
     private Integer employeeId;
+
+    private boolean isPartialAllowed;
 }

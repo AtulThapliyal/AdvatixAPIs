@@ -16,6 +16,9 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
+
+import static java.lang.reflect.Array.get;
 
 @Service
 public class OrderService {
@@ -39,21 +42,25 @@ public class OrderService {
         orderInfo.getOrderItemsList().forEach(a -> productIds.add(a.getProductId()));
 
         //get warehouse items from the database
-        List<WarehouseReceivedItems> warehouseReceivedItems = warehouseRepository.findByProductIdIn(productIds);
+        Optional<List<WarehouseReceivedItems>> warehouseReceivedItems = warehouseRepository.findAllByClientIdAndProductIdIn(orderInfo.getClientId(), productIds);
         HashMap<Integer, WarehouseReceivedItems> itemsHashMap = new HashMap<>();
 
-        //save the product id and the whole item in hashmap
-        warehouseReceivedItems.forEach(item -> itemsHashMap.put(item.getProductId(), item));
+        if (warehouseReceivedItems.isPresent()) {
+            //save the product id and the whole item in hashmap
+            warehouseReceivedItems.get().forEach(item -> itemsHashMap.put(item.getProductId(), item));
 
-        //check for the validation in any product and donot save it in fep if order can not be fulfilled
-        CILOrderInfo cilOrder = cilOrderRepository.save(orderInfo);
-        for (CILOrderItems cilOrderItem : orderInfo.getOrderItemsList()) {
-            if (cilOrderItem.getProductQty() <= 0) {
-                throw new NotFoundException("Product with id  " + cilOrderItem.getProductId() + "can not be zero.");
-            } else if (cilOrderItem.getProductQty() > itemsHashMap.get(cilOrderItem.getProductId()).getQuantity()) {
-                cilOrder.setReason("The order can not be completed due to unavailability of products.");
-                return ResponseEntity.ok(cilOrder);
+            //check for the validation in any product and donot save it in fep if order can not be fulfilled
+            CILOrderInfo cilOrder = cilOrderRepository.save(orderInfo);
+            for (CILOrderItems cilOrderItem : orderInfo.getOrderItemsList()) {
+                if (cilOrderItem.getProductQty() <= 0) {
+                    throw new NotFoundException("Product with id  " + cilOrderItem.getProductId() + "can not be zero.");
+                } else if (cilOrderItem.getProductQty() > itemsHashMap.get(cilOrderItem.getProductId()).getQuantity()) {
+                    cilOrder.setReason("The order can not be completed due to unavailability of products.");
+                    return ResponseEntity.ok(cilOrder);
+                }
             }
+        } else {
+            throw new NotFoundException("This id does not belong to this client");
         }
 
 
@@ -64,7 +71,7 @@ public class OrderService {
         fepOrderInfo.setOrderId(orderInfo.getOrderId());
 
         // logic for reducing the quantity from the database for the particular item
-        for (int i = 0 ;i < orderInfo.getOrderItemsList().size();i++){
+        for (int i = 0; i < orderInfo.getOrderItemsList().size(); i++) {
             CILOrderItems cilOrderItem = orderInfo.getOrderItemsList().get(i);
             fepOrderItemsList.add(new FEPOrderItems(cilOrderItem.getProductId(), cilOrderItem.getProductQty()));
 
@@ -73,7 +80,7 @@ public class OrderService {
 //            item.setQuantity(item.getQuantity() - cilOrderItem.getProductQty());
 
             //getting data from hashmap and saving it in database
-            WarehouseReceivedItems item = itemsHashMap.get(cilOrderItem.getProductId()) ;
+            WarehouseReceivedItems item = itemsHashMap.get(cilOrderItem.getProductId());
             item.setQuantity(item.getQuantity() - cilOrderItem.getProductQty());
             warehouseRepository.updateQuantityByProductId(item.getQuantity(), item.getProductId());
 
@@ -85,6 +92,7 @@ public class OrderService {
 
         //save the order in fep as the warehouse has the ability or have sufficient products to fulfil the order.
         fepOrderRepository.save(fepOrderInfo);
+
 
         return null;
     }

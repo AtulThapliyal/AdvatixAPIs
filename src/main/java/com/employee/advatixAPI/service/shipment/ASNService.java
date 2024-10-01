@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ASNService {
@@ -49,25 +50,31 @@ public class ASNService {
 
 
         List<ASNUnits> asnUnitsList = new ArrayList<>();
-        List<WarehouseReceivedItems> warehouseReceivedItemsList = new ArrayList<>();
         for (ASNUnitRequest asnUnit : asnNoticeRequest.getAsnUnitList()) {
             ASNUnits unit = new ASNUnits(asnUnit.getQuantity(), asnUnit.getReceivedQuantity(), asnUnit.getLocation(), productRepository.findByProductId(asnUnit.getProductId()).get());
             asnUnitsList.add(unit);
 
-            WarehouseReceivedItems warehouseReceivedItems = new WarehouseReceivedItems();
+            Optional<WarehouseReceivedItems> receivedItem = warehouseRepository.findWarehouseReceivedItemsByProductId(unit.getProduct().getProductId());
 
-            warehouseReceivedItems.setWarehouseId(asnNoticeRequest.getWarehouseId());
-            warehouseReceivedItems.setLocation(asnUnit.getLocation());
-            warehouseReceivedItems.setClientId(unit.getProduct().getClientId());
-            warehouseReceivedItems.setEmployeeId(asnNoticeRequest.getCreatedBy());
-            warehouseReceivedItems.setQuantity(asnUnit.getReceivedQuantity());
-            warehouseReceivedItems.setProductId(asnUnit.getProductId());
-            warehouseReceivedItems.setCreatedOn(LocalDate.now());
-            warehouseReceivedItems.setLotNumber(asnNoticeRequest.getLotNumber());
-            warehouseReceivedItems.setInventoryStage(InventoryStage.ON_HAND);
-            warehouseReceivedItems.setReceiveStatus(ReceiveStatus.RECEIVED);
+            if(receivedItem.isPresent()){
+                receivedItem.get().setQuantity(receivedItem.get().getQuantity() + unit.getReceivedQty());
+            }else {
+                WarehouseReceivedItems warehouseReceivedItems = new WarehouseReceivedItems();
 
-            warehouseRepository.save(warehouseReceivedItems);
+                warehouseReceivedItems.setWarehouseId(asnNoticeRequest.getWarehouseId());
+                warehouseReceivedItems.setLocation(asnUnit.getLocation());
+                warehouseReceivedItems.setClientId(unit.getProduct().getClientId());
+                warehouseReceivedItems.setEmployeeId(asnNoticeRequest.getCreatedBy());
+                warehouseReceivedItems.setQuantity(asnUnit.getReceivedQuantity());
+                warehouseReceivedItems.setProductId(asnUnit.getProductId());
+                warehouseReceivedItems.setCreatedOn(LocalDate.now());
+                warehouseReceivedItems.setLotNumber(asnNoticeRequest.getLotNumber());
+                warehouseReceivedItems.setInventoryStage(InventoryStage.ON_HAND);
+                warehouseReceivedItems.setReceiveStatus(ReceiveStatus.RECEIVED);
+
+                warehouseRepository.save(warehouseReceivedItems);
+
+            }
         }
         asnNotice.setAsnUnitsList(asnUnitsList);  // set the saved ASNNotice with its units
         ASNNotice savedNotice = asnNoticeRepository.save(asnNotice);  // Save ASNNotice to return
