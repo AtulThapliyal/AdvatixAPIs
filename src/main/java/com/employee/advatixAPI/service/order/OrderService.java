@@ -1,11 +1,10 @@
 package com.employee.advatixAPI.service.order;
 
-import com.employee.advatixAPI.entity.Order.CILOrderInfo;
-import com.employee.advatixAPI.entity.Order.CILOrderItems;
-import com.employee.advatixAPI.entity.Order.FEPOrderInfo;
-import com.employee.advatixAPI.entity.Order.FEPOrderItems;
+import com.employee.advatixAPI.entity.Client.ClientInfo;
+import com.employee.advatixAPI.entity.Order.*;
 import com.employee.advatixAPI.entity.warehouse.WarehouseReceivedItems;
 import com.employee.advatixAPI.exception.NotFoundException;
+import com.employee.advatixAPI.repository.ClientRepo.ClientRepository;
 import com.employee.advatixAPI.repository.Order.CILOrderRepository;
 import com.employee.advatixAPI.repository.Order.FEPOrderRepository;
 import com.employee.advatixAPI.service.warehouse.WarehouseRepository;
@@ -17,8 +16,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
-
-import static java.lang.reflect.Array.get;
 
 @Service
 public class OrderService {
@@ -32,9 +29,11 @@ public class OrderService {
     @Autowired
     WarehouseRepository warehouseRepository;
 
+    @Autowired
+    ClientRepository clientRepository;
+
 
     public ResponseEntity<?> generateOrder(CILOrderInfo orderInfo) {
-        //first save the order in cil layer
 
         //make a array list to save product Id to get from data at one using In query
         List<Integer> productIds = new ArrayList<>();
@@ -46,55 +45,85 @@ public class OrderService {
         HashMap<Integer, WarehouseReceivedItems> itemsHashMap = new HashMap<>();
 
         if (warehouseReceivedItems.isPresent()) {
-            //save the product id and the whole item in hashmap
             warehouseReceivedItems.get().forEach(item -> itemsHashMap.put(item.getProductId(), item));
 
-            //check for the validation in any product and donot save it in fep if order can not be fulfilled
+            ClientInfo clientInfo = clientRepository.findById(orderInfo.getClientId()).get();
+
+            //saved the order
             CILOrderInfo cilOrder = cilOrderRepository.save(orderInfo);
-            for (CILOrderItems cilOrderItem : orderInfo.getOrderItemsList()) {
-                if (cilOrderItem.getProductQty() <= 0) {
-                    throw new NotFoundException("Product with id  " + cilOrderItem.getProductId() + "can not be zero.");
-                } else if (cilOrderItem.getProductQty() > itemsHashMap.get(cilOrderItem.getProductId()).getQuantity()) {
-                    cilOrder.setReason("The order can not be completed due to unavailability of products.");
-                    return ResponseEntity.ok(cilOrder);
+
+            if (clientInfo.getIsPartialAllowed()) {
+                CILOrderInfo cilOrderInfoBackOrder = new CILOrderInfo();
+                List<CILOrderItems> orderItemsBackOrder = new ArrayList<>();
+
+                List<CILOrderItems> orderItems = new ArrayList<>();
+
+                for (CILOrderItems cilOrderItem : orderInfo.getOrderItemsList()) {
+                    Integer warehouseInventory = itemsHashMap.get(cilOrderItem.getProductId()).getQuantity();
+                    if (cilOrderItem.getProductQty() > warehouseInventory) {
+                        CILOrderItems backOrderItem = new CILOrderItems();
+                        backOrderItem.setProductId(cilOrderItem.getProductId());
+                        backOrderItem.setProductQty(cilOrderItem.getProductQty() - warehouseInventory);
+                        orderItemsBackOrder.add(backOrderItem);
+
+                        if (warehouseInventory > 0) {
+                            CILOrderItems orderItem = new CILOrderItems();
+                            orderItem.setProductId(cilOrderItem.getProductId());
+                            orderItem.setProductQty(warehouseInventory);
+                            orderItems.add(orderItem);
+                        }
+                    } else {
+                        CILOrderItems orderItem = new CILOrderItems();
+                        orderItem.setProductId(cilOrderItem.getProductId());
+                        orderItem.setProductQty(cilOrderItem.getProductQty());
+                        orderItems.add(orderItem);
+                    }
+
+                }
+
+                if (!orderItemsBackOrder.isEmpty()) {
+                    cilOrderInfoBackOrder.setClientId(cilOrder.getClientId());
+                    cilOrderInfoBackOrder.setOrderItemsList(orderItemsBackOrder);
+                    cilOrderInfoBackOrder.setStatusId(18);
+                    cilOrderRepository.save(cilOrderInfoBackOrder);
+                }
+
+                if (!orderItems.isEmpty()) {
+                    saveInFEP(cilOrder, orderItems, itemsHashMap);
+                }
+            }
+            else {
+                for (CILOrderItems cilOrderItem : orderInfo.getOrderItemsList()) {
+                    if (cilOrderItem.getProductQty() <= 0) {
+                        throw new NotFoundException("Product with id  " + cilOrderItem.getProductId() + "can not be zero.");
+                    } else if (cilOrderItem.getProductQty() > itemsHashMap.get(cilOrderItem.getProductId()).getQuantity()) {
+                        cilOrder.setReason("The order can not be completed due to unavailability of products.");
+                        return ResponseEntity.ok(cilOrder);
+                    }
                 }
             }
         } else {
             throw new NotFoundException("This id does not belong to this client");
         }
+        return null;
+    }
 
-
-        // if the details are correct and warehouse has the ability to fulfil the order then save it in fep
+    private void saveInFEP(CILOrderInfo orderInfo, List<CILOrderItems> orderItems, HashMap<Integer, WarehouseReceivedItems> itemsHashMap) {
         FEPOrderInfo fepOrderInfo = new FEPOrderInfo();
         List<FEPOrderItems> fepOrderItemsList = new ArrayList<>();
         fepOrderInfo.setClientId(orderInfo.getClientId());
         fepOrderInfo.setOrderId(orderInfo.getOrderId());
 
-        // logic for reducing the quantity from the database for the particular item
-        for (int i = 0; i < orderInfo.getOrderItemsList().size(); i++) {
-            CILOrderItems cilOrderItem = orderInfo.getOrderItemsList().get(i);
+        for (int i = 0; i < orderItems.size(); i++) {
+            CILOrderItems cilOrderItem = orderItems.get(i);
             fepOrderItemsList.add(new FEPOrderItems(cilOrderItem.getProductId(), cilOrderItem.getProductQty()));
-
-            //getting the data one by one
-//            WarehouseReceivedItems item = warehouseRepository.findByProductId(cilOrderItem.getProductId());
-//            item.setQuantity(item.getQuantity() - cilOrderItem.getProductQty());
-
-            //getting data from hashmap and saving it in database
             WarehouseReceivedItems item = itemsHashMap.get(cilOrderItem.getProductId());
             item.setQuantity(item.getQuantity() - cilOrderItem.getProductQty());
             warehouseRepository.updateQuantityByProductId(item.getQuantity(), item.getProductId());
-
         }
 
-
-        //set the order list in fep
         fepOrderInfo.setOrderItemsList(fepOrderItemsList);
-
-        //save the order in fep as the warehouse has the ability or have sufficient products to fulfil the order.
         fepOrderRepository.save(fepOrderInfo);
-
-
-        return null;
     }
 
 }

@@ -21,4 +21,6 @@ public class CILOrderInfo {
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "order_id_fk", referencedColumnName = "order_id")
     private List<CILOrderItems> orderItemsList;
+
+    private Integer statusId;
 }

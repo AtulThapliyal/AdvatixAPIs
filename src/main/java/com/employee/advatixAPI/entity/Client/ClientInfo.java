@@ -30,5 +30,5 @@ public class ClientInfo {
 
     private Integer employeeId;
 
-    private boolean isPartialAllowed;
+    private Boolean isPartialAllowed;
 }

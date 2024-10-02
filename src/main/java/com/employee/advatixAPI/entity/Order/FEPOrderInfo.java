@@ -11,7 +11,6 @@ import java.util.List;
 public class FEPOrderInfo {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "order_id")
     private Integer orderId;
 
