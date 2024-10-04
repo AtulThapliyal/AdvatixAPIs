@@ -56,6 +56,127 @@ public class OrderService {
     @Autowired
     PartnerRepository partnerRepository;
 
+    public ResponseEntity<?> createOrder(OrderRequestDto orderInfo) {
+        List<Integer> productIds = new ArrayList<>();
+
+        orderInfo.getOrderItemsList().forEach(a -> productIds.add(a.getProductId()));
+
+        Optional<List<WarehouseReceivedItems>> warehouseReceivedItems = warehouseRepository.findAllByClientIdAndProductIdIn(orderInfo.getClientId(), productIds);
+        HashMap<Integer, WarehouseReceivedItems> itemsHashMap = new HashMap<>();
+
+        CILOrderInfo cilOrder = new CILOrderInfo();
+
+        if (warehouseReceivedItems.isPresent()) {
+            warehouseReceivedItems.get().forEach(item -> itemsHashMap.put(item.getProductId(), item));
+
+            ClientInfo clientInfo = clientRepository.findById(orderInfo.getClientId()).get();
+
+            Optional<ClientCarrierInfo> carrierInfo = clientCarrierRepository.findByClientId(clientInfo.getClientId());
+            List<CILOrderItems> orderItems = new ArrayList<>();
+
+            cilOrder.setStatusId(0);
+            cilOrder.setClientId(orderInfo.getClientId());
+            cilOrder.setCountryId(orderInfo.getCountryId());
+            cilOrder.setStateId(orderInfo.getStateId());
+            cilOrder.setCityId(orderInfo.getCityId());
+
+            for (OrderListRequestDto cilOrderItem : orderInfo.getOrderItemsList()) {
+                CILOrderItems cilOrderItems = new CILOrderItems();
+                cilOrderItems.setProductId(cilOrderItem.getProductId());
+                cilOrderItems.setProductQty(cilOrderItem.getProductQty());
+
+                orderItems.add(cilOrderItems);
+            }
+            cilOrder.setOrderItemsList(orderItems);
+
+            if (carrierInfo.isPresent()) {
+                PartnerInfo partnerInfo = partnerRepository.findByPartnerId(carrierInfo.get().getPartnerId());
+                cilOrder.setCarrierId(carrierInfo.get().getPartnerId());
+                cilOrder.setCarrierName(partnerInfo.getPartnerName());
+                cilOrder.setServiceType(partnerInfo.getServiceType());
+            }
+
+            CILOrderInfo orderInformation = cilOrderRepository.save(cilOrder);
+
+
+            //checking the addresses like country city state
+
+
+            if (clientInfo.getIsPartialAllowed()) {
+                CILOrderInfo cilOrderInfoBackOrder = new CILOrderInfo();
+                List<CILOrderItems> orderItemsBackOrder = new ArrayList<>();
+
+                List<CILOrderItems> newOrderItems = new ArrayList<>();
+
+                for (CILOrderItems cilOrderItem : orderInformation.getOrderItemsList()) {
+                    Integer warehouseInventory = itemsHashMap.get(cilOrderItem.getProductId()).getQuantity();
+
+                    if (cilOrderItem.getProductQty() > warehouseInventory) {
+                        CILOrderItems backOrderItem = new CILOrderItems();
+                        backOrderItem.setProductId(cilOrderItem.getProductId());
+                        backOrderItem.setProductQty(cilOrderItem.getProductQty() - warehouseInventory);
+                        orderItemsBackOrder.add(backOrderItem);
+
+                        if (warehouseInventory > 0) {
+                            CILOrderItems orderItem = new CILOrderItems();
+
+                            orderItem.setProductId(cilOrderItem.getProductId());
+                            orderItem.setProductQty(warehouseInventory);
+                            newOrderItems.add(orderItem);
+                        }
+                    } else {
+                        CILOrderItems orderItem = new CILOrderItems();
+
+                        orderItem.setProductId(cilOrderItem.getProductId());
+                        orderItem.setProductQty(cilOrderItem.getProductQty());
+                        newOrderItems.add(orderItem);
+                    }
+
+                }
+
+                if (!orderItemsBackOrder.isEmpty()) {
+                    cilOrderInfoBackOrder.setClientId(cilOrder.getClientId());
+
+                    //setting the back order list in database with status 18(BackOrder)
+                    cilOrderInfoBackOrder.setOrderItemsList(orderItemsBackOrder);
+
+                    cilOrderInfoBackOrder.setStatusId(18);
+                    cilOrderInfoBackOrder.setCountryId(orderInfo.getCountryId());
+                    cilOrderInfoBackOrder.setStateId(orderInfo.getStateId());
+                    cilOrderInfoBackOrder.setCityId(orderInfo.getCityId());
+                    cilOrderInfoBackOrder.setCarrierId(cilOrder.getCarrierId());
+
+                    if (carrierInfo.isPresent()) {
+                        PartnerInfo partnerInfo = partnerRepository.findByPartnerId(carrierInfo.get().getPartnerId());
+                        cilOrderInfoBackOrder.setCarrierId(carrierInfo.get().getPartnerId());
+                        cilOrderInfoBackOrder.setCarrierName(partnerInfo.getPartnerName());
+                        cilOrderInfoBackOrder.setServiceType(partnerInfo.getServiceType());
+                    }
+                    cilOrderRepository.save(cilOrderInfoBackOrder);
+                }
+
+                if (!newOrderItems.isEmpty()) {
+                    saveInFEP(cilOrder, newOrderItems, itemsHashMap);
+                }
+
+
+            } else {
+                for (OrderListRequestDto cilOrderItem : orderInfo.getOrderItemsList()) {
+                    if (cilOrderItem.getProductQty() <= 0) {
+                        throw new NotFoundException("Product with id  " + cilOrderItem.getProductId() + "can not be zero.");
+                    } else if (cilOrderItem.getProductQty() > itemsHashMap.get(cilOrderItem.getProductId()).getQuantity()) {
+                        orderInformation.setReason("The order can not be completed due to unavailability of products.");
+                        return ResponseEntity.ok(orderInformation);
+                    }
+                    saveInFEP(cilOrder, orderItems, itemsHashMap);
+                }
+            }
+        } else {
+            throw new NotFoundException("This id does not belong to this client");
+        }
+
+        return null;
+    }
 
     private void saveInFEP(CILOrderInfo orderInfo, List<CILOrderItems> orderItems, HashMap<Integer, WarehouseReceivedItems> itemsHashMap) {
         FEPOrderInfo fepOrderInfo = new FEPOrderInfo();
@@ -83,125 +204,6 @@ public class OrderService {
         fepOrderRepository.save(fepOrderInfo);
     }
 
-    public ResponseEntity<?> createOrder(OrderRequestDto orderInfo) {
-        List<Integer> productIds = new ArrayList<>();
-
-        orderInfo.getOrderItemsList().forEach(a -> productIds.add(a.getProductId()));
-
-        Optional<List<WarehouseReceivedItems>> warehouseReceivedItems = warehouseRepository.findAllByClientIdAndProductIdIn(orderInfo.getClientId(), productIds);
-        HashMap<Integer, WarehouseReceivedItems> itemsHashMap = new HashMap<>();
-
-        CILOrderInfo cilOrder = new CILOrderInfo();
-
-
-        if (warehouseReceivedItems.isPresent()) {
-            warehouseReceivedItems.get().forEach(item -> itemsHashMap.put(item.getProductId(), item));
-
-            ClientInfo clientInfo = clientRepository.findById(orderInfo.getClientId()).get();
-
-            Optional<ClientCarrierInfo> carrierInfo = clientCarrierRepository.findByClientId(clientInfo.getClientId());
-            List<CILOrderItems> orderItems = new ArrayList<>();
-            cilOrder.setStatusId(0);
-            cilOrder.setClientId(orderInfo.getClientId());
-
-            cilOrder.setCountryId(orderInfo.getCountryId());
-            cilOrder.setStateId(orderInfo.getStateId());
-            cilOrder.setCityId(orderInfo.getCityId());
-            for (OrderListRequestDto cilOrderItem : orderInfo.getOrderItemsList()) {
-                CILOrderItems cilOrderItems = new CILOrderItems();
-                cilOrderItems.setProductId(cilOrderItem.getProductId());
-                cilOrderItems.setProductQty(cilOrderItem.getProductQty());
-
-                orderItems.add(cilOrderItems);
-            }
-            cilOrder.setOrderItemsList(orderItems);
-
-            if (carrierInfo.isPresent()) {
-                PartnerInfo partnerInfo = partnerRepository.findByPartnerId(carrierInfo.get().getPartnerId());
-                cilOrder.setCarrierId(carrierInfo.get().getPartnerId());
-                cilOrder.setCarrierName(partnerInfo.getPartnerName());
-                cilOrder.setServiceType(partnerInfo.getServiceType());
-
-            }
-
-            CILOrderInfo orderInformation = cilOrderRepository.save(cilOrder);
-
-
-            //checking the addresses like country city state
-
-
-
-            if (clientInfo.getIsPartialAllowed()) {
-                CILOrderInfo cilOrderInfoBackOrder = new CILOrderInfo();
-                List<CILOrderItems> orderItemsBackOrder = new ArrayList<>();
-
-                List<CILOrderItems> newOrderItems = new ArrayList<>();
-
-                for (CILOrderItems cilOrderItem : orderInformation.getOrderItemsList()) {
-                    Integer warehouseInventory = itemsHashMap.get(cilOrderItem.getProductId()).getQuantity();
-                    if (cilOrderItem.getProductQty() > warehouseInventory) {
-                        CILOrderItems backOrderItem = new CILOrderItems();
-                        backOrderItem.setProductId(cilOrderItem.getProductId());
-                        backOrderItem.setProductQty(cilOrderItem.getProductQty() - warehouseInventory);
-                        orderItemsBackOrder.add(backOrderItem);
-
-                        if (warehouseInventory > 0) {
-                            CILOrderItems orderItem = new CILOrderItems();
-
-                            orderItem.setProductId(cilOrderItem.getProductId());
-                            orderItem.setProductQty(warehouseInventory);
-                            newOrderItems.add(orderItem);
-                        }
-                    } else {
-                        CILOrderItems orderItem = new CILOrderItems();
-
-                        orderItem.setProductId(cilOrderItem.getProductId());
-                        orderItem.setProductQty(cilOrderItem.getProductQty());
-                        newOrderItems.add(orderItem);
-                    }
-
-                }
-
-                if (!orderItemsBackOrder.isEmpty()) {
-                    cilOrderInfoBackOrder.setClientId(cilOrder.getClientId());
-                    cilOrderInfoBackOrder.setOrderItemsList(orderItemsBackOrder);
-                    cilOrderInfoBackOrder.setStatusId(18);
-                    cilOrderInfoBackOrder.setCountryId(orderInfo.getCountryId());
-                    cilOrderInfoBackOrder.setStateId(orderInfo.getStateId());
-                    cilOrderInfoBackOrder.setCityId(orderInfo.getCityId());
-                    cilOrderInfoBackOrder.setCarrierId(1);
-
-                    if (carrierInfo.isPresent()) {
-                        PartnerInfo partnerInfo = partnerRepository.findByPartnerId(carrierInfo.get().getPartnerId());
-                        cilOrderInfoBackOrder.setCarrierId(carrierInfo.get().getPartnerId());
-                        cilOrderInfoBackOrder.setCarrierName(partnerInfo.getPartnerName());
-                        cilOrderInfoBackOrder.setServiceType(partnerInfo.getServiceType());
-                    }
-                    cilOrderRepository.save(cilOrderInfoBackOrder);
-                }
-
-                if (!newOrderItems.isEmpty()) {
-                    saveInFEP(cilOrder, newOrderItems, itemsHashMap);
-                }
-
-
-            }
-            else {
-                for (OrderListRequestDto cilOrderItem : orderInfo.getOrderItemsList()) {
-                    if (cilOrderItem.getProductQty() <= 0) {
-                        throw new NotFoundException("Product with id  " + cilOrderItem.getProductId() + "can not be zero.");
-                    } else if (cilOrderItem.getProductQty() > itemsHashMap.get(cilOrderItem.getProductId()).getQuantity()) {
-                        orderInformation.setReason("The order can not be completed due to unavailability of products.");
-                        return ResponseEntity.ok(orderInformation);
-                    }
-                    saveInFEP(cilOrder, orderItems, itemsHashMap);
-                }
-            }
-        } else {
-            throw new NotFoundException("This id does not belong to this client");
-        }
-
-        return null;
-    }
 
 }
+
