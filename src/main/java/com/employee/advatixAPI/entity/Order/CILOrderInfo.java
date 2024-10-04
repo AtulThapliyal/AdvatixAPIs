@@ -23,4 +23,13 @@ public class CILOrderInfo {
     private List<CILOrderItems> orderItemsList;
 
     private Integer statusId;
+
+    //address fields
+    private Integer countryId;
+    private Integer stateId;
+    private Integer cityId;
+
+    private Integer carrierId;
+    private String carrierName;
+    private String serviceType;
 }

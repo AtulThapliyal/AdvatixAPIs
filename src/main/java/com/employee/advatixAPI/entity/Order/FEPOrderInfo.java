@@ -19,5 +19,14 @@ public class FEPOrderInfo {
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "order_id_fk", referencedColumnName = "order_id")
     private List<FEPOrderItems> orderItemsList;
+
+    //address
+    private Integer countryId;
+    private Integer stateId;
+    private Integer cityId;
+
+    private Integer carrierId;
+    private String carrierName;
+    private String serviceType;
 }
 

@@ -1,5 +1,6 @@
 package com.employee.advatixAPI.controller.order;
 
+import com.employee.advatixAPI.dto.order.OrderRequestDto;
 import com.employee.advatixAPI.entity.Order.CILOrderInfo;
 import com.employee.advatixAPI.service.order.OrderService;
 import org.apache.coyote.Response;
@@ -16,8 +17,14 @@ public class OrderController {
     @Autowired
     OrderService orderService;
 
+//    @PostMapping("/generateOrder")
+//    public ResponseEntity<?> createOrder(@RequestBody CILOrderInfo orderInfo){
+//        return orderService.generateOrder(orderInfo);
+//    }
+
     @PostMapping("/generateOrder")
-    public ResponseEntity<?> createOrder(@RequestBody CILOrderInfo orderInfo){
-        return orderService.generateOrder(orderInfo);
+    public ResponseEntity<?> createOrder(@RequestBody OrderRequestDto orderRequestDto){
+        return orderService.createOrder(orderRequestDto);
     }
+
 }

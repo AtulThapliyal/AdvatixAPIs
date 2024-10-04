@@ -1,4 +1,4 @@
-package com.employee.advatixAPI.entity.Client;
+package com.employee.advatixAPI.entity.Address;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;

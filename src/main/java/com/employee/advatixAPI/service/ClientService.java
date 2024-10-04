@@ -1,10 +1,10 @@
 package com.employee.advatixAPI.service;
 
 import com.employee.advatixAPI.dto.ClientResponse;
-import com.employee.advatixAPI.entity.Client.City;
+import com.employee.advatixAPI.entity.Address.City;
 import com.employee.advatixAPI.entity.Client.ClientInfo;
-import com.employee.advatixAPI.entity.Client.Country;
-import com.employee.advatixAPI.entity.Client.States;
+import com.employee.advatixAPI.entity.Address.Country;
+import com.employee.advatixAPI.entity.Address.States;
 import com.employee.advatixAPI.exception.NotFoundException;
 import com.employee.advatixAPI.repository.ClientRepo.CityRepository;
 import com.employee.advatixAPI.repository.ClientRepo.ClientRepository;

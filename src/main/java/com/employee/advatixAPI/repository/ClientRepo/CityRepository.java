@@ -1,6 +1,6 @@
 package com.employee.advatixAPI.repository.ClientRepo;
 
-import com.employee.advatixAPI.entity.Client.City;
+import com.employee.advatixAPI.entity.Address.City;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
