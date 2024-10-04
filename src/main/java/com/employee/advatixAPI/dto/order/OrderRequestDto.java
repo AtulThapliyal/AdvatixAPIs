@@ -10,9 +10,7 @@ import java.util.List;
 @Data
 public class OrderRequestDto {
     private Integer clientId;
-    private String reason;
     private List<OrderListRequestDto> orderItemsList;
-    private Integer statusId;
     private Integer countryId;
     private Integer stateId;
     private Integer cityId;

@@ -2,6 +2,7 @@ package com.employee.advatixAPI.service;
 
 import com.employee.advatixAPI.dto.ClientResponse;
 import com.employee.advatixAPI.entity.Address.City;
+import com.employee.advatixAPI.entity.Carrier.ClientCarrierInfo;
 import com.employee.advatixAPI.entity.Client.ClientInfo;
 import com.employee.advatixAPI.entity.Address.Country;
 import com.employee.advatixAPI.entity.Address.States;
@@ -10,6 +11,7 @@ import com.employee.advatixAPI.repository.ClientRepo.CityRepository;
 import com.employee.advatixAPI.repository.ClientRepo.ClientRepository;
 import com.employee.advatixAPI.repository.ClientRepo.CountryRepository;
 import com.employee.advatixAPI.repository.ClientRepo.StateRepository;
+import com.employee.advatixAPI.repository.partner.ClientCarrier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +31,9 @@ public class ClientService {
 
     @Autowired
     CityRepository cityRepository;
+
+    @Autowired
+    ClientCarrier clientCarrierRepository;
 
     public ClientResponse getClientById(Integer clientId) {
         ClientResponse clientResponse = new ClientResponse();
@@ -60,6 +65,12 @@ public class ClientService {
             throw new NotFoundException("City with id " + clientInfo.getCityId() + " not found");
         }
 
+        ClientCarrierInfo clientPartner = new ClientCarrierInfo();
+        if(clientInfo.getPartnerId() != null){
+            clientPartner.setClientId(clientInfo.getClientId());
+            clientPartner.setPartnerId(clientInfo.getPartnerId());
+            clientCarrierRepository.save(clientPartner);
+        }
         clientRepository.save(clientInfo);
 
         System.out.println(clientInfo);

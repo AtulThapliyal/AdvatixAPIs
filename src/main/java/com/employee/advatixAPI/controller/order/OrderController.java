@@ -23,7 +23,7 @@ public class OrderController {
 //    }
 
     @PostMapping("/generateOrder")
-    public ResponseEntity<?> createOrder(@RequestBody OrderRequestDto orderRequestDto){
+    public ResponseEntity<?> generateOrder(@RequestBody OrderRequestDto orderRequestDto){
         return orderService.createOrder(orderRequestDto);
     }
 

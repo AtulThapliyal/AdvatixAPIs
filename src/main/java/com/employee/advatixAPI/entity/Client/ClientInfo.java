@@ -31,4 +31,7 @@ public class ClientInfo {
     private Integer employeeId;
 
     private Boolean isPartialAllowed;
+
+    //carrier
+    private Integer partnerId;
 }
