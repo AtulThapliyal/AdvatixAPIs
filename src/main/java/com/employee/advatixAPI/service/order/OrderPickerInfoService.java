@@ -27,6 +27,16 @@ public class OrderPickerInfoService {
         Optional<FEPOrderInfo> fepOrderInfo = fepOrderRepository.findById(orderPickerDto.getOrderId());
 
         if(fepOrderInfo.isPresent()){
+            Optional<OrderPickerInfo> orderPickerInformation = orderPickerInfoRepository.findByOrderNumber(fepOrderInfo.get().getOrderNumber());
+            if(orderPickerInformation.isPresent()){
+                orderPickerInformation.get().setPickerName(orderPickerDto.getPickerName());
+                orderPickerInformation.get().setUpdatedOn(LocalDate.now());
+
+                orderPickerInfoRepository.save(orderPickerInformation.get());
+
+                return ResponseEntity.ok(orderPickerInformation);
+
+            }
             OrderPickerInfo orderPickerInfo = new OrderPickerInfo();
 
             orderPickerInfo.setOrderNumber(fepOrderInfo.get().getOrderNumber());
