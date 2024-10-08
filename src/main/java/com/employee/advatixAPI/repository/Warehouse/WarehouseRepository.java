@@ -1,6 +1,5 @@
-package com.employee.advatixAPI.service.warehouse;
+package com.employee.advatixAPI.repository.Warehouse;
 
-import com.employee.advatixAPI.entity.warehouse.Warehouse;
 import com.employee.advatixAPI.entity.warehouse.WarehouseReceivedItems;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;

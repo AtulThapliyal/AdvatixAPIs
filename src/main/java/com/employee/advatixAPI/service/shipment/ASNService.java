@@ -10,8 +10,8 @@ import com.employee.advatixAPI.entity.warehouse.enums.ReceiveStatus;
 import com.employee.advatixAPI.repository.EmployeeRepository;
 import com.employee.advatixAPI.repository.Shipment.ASNNoticeRepository;
 import com.employee.advatixAPI.repository.Shipment.ASNUnitRepository;
+import com.employee.advatixAPI.repository.Warehouse.WarehouseRepository;
 import com.employee.advatixAPI.repository.product.ProductRepository;
-import com.employee.advatixAPI.service.warehouse.WarehouseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
