@@ -27,8 +27,8 @@ public class WarehouseBoxLabelService {
     public ResponseEntity<?> generateLabelsLists(BoxRequest boxRequest) {
         Pageable pageable = PageRequest.of(0, boxRequest.getQuantity());
 
-        if(!whRepository.existsById(boxRequest.getWarehouseId())){
-            throw new NotFoundException("The warehouse with warehouse id "+ boxRequest.getWarehouseId() +" does not exists");
+        if (!whRepository.existsById(boxRequest.getWarehouseId())) {
+            throw new NotFoundException("The warehouse with warehouse id " + boxRequest.getWarehouseId() + " does not exists");
         }
 
         List<WarehouseBox> warehouseBoxList = warehouseBoxLabelRepository.findByBoxTypeAndWarehouseIdAndStatus(boxRequest.getBoxType(), boxRequest.getWarehouseId(), true, pageable);
@@ -48,6 +48,11 @@ public class WarehouseBoxLabelService {
             boxIds.add(warehouseBox.getBoxId());
             warehouseBoxLabelRepository.save(warehouseBox);
         }
+
+//        warehouseBoxList.forEach(box ->
+////        box.setStatus(false)
+//        boxIds.add(box.getBoxId())
+//        );
         warehouseBoxResponse.setBoxIds(boxIds);
 
         return ResponseEntity.ok(warehouseBoxResponse);

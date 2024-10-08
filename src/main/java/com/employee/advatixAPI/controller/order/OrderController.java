@@ -6,10 +6,7 @@ import com.employee.advatixAPI.service.order.OrderService;
 import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/order")
@@ -25,6 +22,11 @@ public class OrderController {
     @PostMapping("/generateOrder")
     public ResponseEntity<?> generateOrder(@RequestBody OrderRequestDto orderRequestDto){
         return orderService.createOrder(orderRequestDto);
+    }
+
+    @GetMapping("/getOrderDetails/{orderNumber}")
+    public ResponseEntity<?> getOrderDetails(@PathVariable String orderNumber){
+        return orderService.getOrderDetails(orderNumber);
     }
 
 }

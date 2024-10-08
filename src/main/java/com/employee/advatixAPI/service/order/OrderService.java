@@ -1,5 +1,6 @@
 package com.employee.advatixAPI.service.order;
 
+import com.employee.advatixAPI.dto.order.OrderDetailsDto;
 import com.employee.advatixAPI.dto.order.OrderListRequestDto;
 import com.employee.advatixAPI.dto.order.OrderRequestDto;
 import com.employee.advatixAPI.entity.Carrier.ClientCarrierInfo;
@@ -220,5 +221,19 @@ public class OrderService {
         return "ORDER"+orderId+"s1";
     }
 
+    public ResponseEntity<?> getOrderDetails(String orderNumber) {
+        OrderDetailsDto orderDetails = new OrderDetailsDto();
+
+       Optional<FEPOrderInfo> fepOrderInfo =  fepOrderRepository.findByOrderNumber(orderNumber);
+       if(fepOrderInfo.isPresent()){
+           orderDetails.setOrderNumber(fepOrderInfo.get().getOrderNumber());
+           orderDetails.setProductDetails(fepOrderInfo.get().getOrderItemsList());
+
+           return ResponseEntity.ok(orderDetails);
+       }else
+       {
+           throw new NotFoundException("The Order number does not exist" + orderNumber);
+       }
+    }
 }
 
