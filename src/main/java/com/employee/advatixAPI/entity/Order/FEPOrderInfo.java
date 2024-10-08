@@ -28,5 +28,9 @@ public class FEPOrderInfo {
     private Integer carrierId;
     private String carrierName;
     private String serviceType;
+
+    private Integer statusId;
+
+    private String orderNumber;
 }
 

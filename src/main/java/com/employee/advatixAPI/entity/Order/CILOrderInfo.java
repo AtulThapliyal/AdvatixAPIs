@@ -32,4 +32,6 @@ public class CILOrderInfo {
     private Integer carrierId;
     private String carrierName;
     private String serviceType;
+
+    private String orderNumber;
 }

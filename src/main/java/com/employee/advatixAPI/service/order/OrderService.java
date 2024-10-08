@@ -64,6 +64,7 @@ public class OrderService {
         Optional<List<WarehouseReceivedItems>> warehouseReceivedItems = warehouseRepository.findAllByClientIdAndProductIdIn(orderInfo.getClientId(), productIds);
         HashMap<Integer, WarehouseReceivedItems> itemsHashMap = new HashMap<>();
 
+
         CILOrderInfo cilOrder = new CILOrderInfo();
 
         if (warehouseReceivedItems.isPresent()) {
@@ -98,6 +99,7 @@ public class OrderService {
 
             CILOrderInfo orderInformation = cilOrderRepository.save(cilOrder);
 
+            orderInformation.setOrderNumber(generateOrderNumber(orderInformation.getOrderId()));
 
             //checking the addresses like country city state
 
@@ -152,6 +154,8 @@ public class OrderService {
                         cilOrderInfoBackOrder.setCarrierName(partnerInfo.getPartnerName());
                         cilOrderInfoBackOrder.setServiceType(partnerInfo.getServiceType());
                     }
+                    cilOrderInfoBackOrder.setOrderNumber(generateSplitOrderNumber(orderInformation.getOrderId()));
+
                     cilOrderRepository.save(cilOrderInfoBackOrder);
                 }
 
@@ -186,6 +190,8 @@ public class OrderService {
         fepOrderInfo.setCityId(orderInfo.getCityId());
         fepOrderInfo.setCountryId(orderInfo.getCountryId());
         fepOrderInfo.setStateId(orderInfo.getStateId());
+        fepOrderInfo.setStatusId(1);
+        fepOrderInfo.setOrderNumber(orderInfo.getOrderNumber());
 
         for (int i = 0; i < orderItems.size(); i++) {
             CILOrderItems cilOrderItem = orderItems.get(i);
@@ -202,8 +208,17 @@ public class OrderService {
         fepOrderInfo.setCarrierName(orderInfo.getCarrierName());
         fepOrderInfo.setServiceType(orderInfo.getServiceType());
         fepOrderRepository.save(fepOrderInfo);
+
+
     }
 
+    public String generateOrderNumber(Integer orderId){
+        return "ORDER"+orderId;
+    }
+
+    public String generateSplitOrderNumber(Integer orderId){
+        return "ORDER"+orderId+"s1";
+    }
 
 }
 
