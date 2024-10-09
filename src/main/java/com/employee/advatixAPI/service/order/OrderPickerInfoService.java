@@ -24,36 +24,37 @@ public class OrderPickerInfoService {
 
     public ResponseEntity<?> assignPicker(OrderPickerDto orderPickerDto) {
 
-        Optional<FEPOrderInfo> fepOrderInfo = fepOrderRepository.findById(orderPickerDto.getOrderId());
+        //find the order with the order id in fep layer.
+        FEPOrderInfo fepOrderInfo = fepOrderRepository.findById(orderPickerDto.getOrderId()).orElseThrow(() -> new NotFoundException("No id found with " + orderPickerDto.getOrderId()));
 
-        if(fepOrderInfo.isPresent()){
-            Optional<OrderPickerInfo> orderPickerInformation = orderPickerInfoRepository.findByOrderNumber(fepOrderInfo.get().getOrderNumber());
-            if(orderPickerInformation.isPresent()){
-                orderPickerInformation.get().setPickerName(orderPickerDto.getPickerName());
-                orderPickerInformation.get().setUpdatedOn(LocalDate.now());
+        //get the order information if already present in order picker table
+        Optional<OrderPickerInfo> orderPickerInformation = orderPickerInfoRepository.findByOrderNumber(fepOrderInfo.getOrderNumber());
 
-                orderPickerInfoRepository.save(orderPickerInformation.get());
+       //if present update the updated on day and picker name as all other fields can not be changed.
+        if (orderPickerInformation.isPresent()) {
+            orderPickerInformation.get().setPickerName(orderPickerDto.getPickerName());
+            orderPickerInformation.get().setUpdatedOn(LocalDate.now());
 
-                return ResponseEntity.ok(orderPickerInformation);
+            orderPickerInfoRepository.save(orderPickerInformation.get());
+            return ResponseEntity.ok(orderPickerInformation);
 
-            }
-            OrderPickerInfo orderPickerInfo = new OrderPickerInfo();
-
-            orderPickerInfo.setOrderNumber(fepOrderInfo.get().getOrderNumber());
-            orderPickerInfo.setPickerName(orderPickerDto.getPickerName());
-            orderPickerInfo.setStatus(true);
-            orderPickerInfo.setCreatedOn(LocalDate.now());
-            orderPickerInfo.setUpdatedOn(LocalDate.now());
-
-            orderPickerInfoRepository.save(orderPickerInfo);
-
-            fepOrderInfo.get().setStatusId(3);
-            fepOrderRepository.save(fepOrderInfo.get());
-
-
-            return ResponseEntity.ok(orderPickerInfo);
         }
-        throw new NotFoundException("The order Id does not exists");
 
+        //if no order found in order picker generate a new record and insert into it
+        OrderPickerInfo orderPickerInfo = new OrderPickerInfo();
+
+        orderPickerInfo.setOrderNumber(fepOrderInfo.getOrderNumber());
+        orderPickerInfo.setPickerName(orderPickerDto.getPickerName());
+        orderPickerInfo.setStatus(true);
+        orderPickerInfo.setCreatedOn(LocalDate.now());
+        orderPickerInfo.setUpdatedOn(LocalDate.now());
+
+        orderPickerInfoRepository.save(orderPickerInfo);
+
+        //change the status id to 3 that is picked.
+        fepOrderInfo.setStatusId(3);
+        fepOrderRepository.save(fepOrderInfo);
+
+        return ResponseEntity.ok(orderPickerInfo);
     }
 }
