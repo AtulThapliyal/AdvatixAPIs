@@ -74,41 +74,42 @@ public class OrderPickerInfoService {
             originalProductsList.put(originalProduct.getProductId(), originalProduct.getProductQty());
         });
 
-        HashMap<Integer, Integer> userProductsList = new HashMap<>();
-
         orderPickerDto.getContainersList().forEach(containers -> {
             containers.getContainerProductsList().forEach(containerProducts -> {
-                if (!userProductsList.containsKey(containerProducts.getProductId())){
-                    userProductsList.put(containerProducts.getProductId(), containerProducts.getQuantity());
-                }else{
-                    userProductsList.compute(containerProducts.getProductId(), (k, qty) -> qty + containerProducts.getQuantity());
-//                    Integer qty = userProductsList.get(containerProducts.getProductId());
-//                    userProductsList.put(containerProducts.getProductId(), qty+containerProducts.getQuantity());
+                Integer productId = containerProducts.getProductId();
+                Integer originalQty = originalProductsList.get(productId);
+                Integer currentQty = containerProducts.getQuantity();
+
+                if (originalQty == null) {
+                    throw new NotFoundException("Product with ID " + productId + " is not found in the original order");
                 }
 
+                // Update the original product quantity by subtracting user-picked quantity
+                originalProductsList.compute(productId, (k, qty) -> (qty == null) ? -currentQty : qty - currentQty);
+
+                // Check if the picked quantity exceeds the original quantity
+                if (originalProductsList.get(productId) < 0) {
+                    throw new NotFoundException("The quantity of product " + productId + " exceeds the order quantity");
+                }
             });
+        });
+
+        originalProductsList.forEach((productId, remainingQty) -> {
+            if (remainingQty > 0) {
+                throw new NotFoundException("The quantity of product " + productId + " is less than the order quantity");
+            }
         });
 
         orderPickerDto.getContainersList().forEach(containers -> {
             containers.getContainerProductsList().forEach(containerProducts -> {
-                Integer originalQty = originalProductsList.get(containerProducts.getProductId());
-                Integer userQty = userProductsList.get(containerProducts.getProductId());
-                if(originalQty > userQty){
-                    throw new NotFoundException("The Quantity of "+ containerProducts.getProductId()+ " is less than order quantity");
-                }else if(originalQty < userQty){
-                    throw new NotFoundException("The Quantity of " + containerProducts.getProductId()+ "is grater than the order quantity");
-                }
                 OrderPickerInfo orderPickerInfo = generateOrderPickerItems(orderPickerDto, fepOrderInfo, containerProducts, containers);
                 orderPickerInfoRepository.save(orderPickerInfo);
             });
         });
 
-        //change the status id to 3 that is picked.
         fepOrderInfo.setStatusId(3);
         fepOrderRepository.save(fepOrderInfo);
-        return null;
-
-//        return ResponseEntity.ok(orderPickerInfo);
+        return ResponseEntity.ok("Order picked Successfully !!");
     }
 
     public OrderPickerInfo generateOrderPickerItems(OrderPickerDto orderPickerDto, FEPOrderInfo fepOrderInfo, ContainerProducts containerProducts, Containers containers){
