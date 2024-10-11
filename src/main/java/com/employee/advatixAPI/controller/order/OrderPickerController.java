@@ -18,4 +18,14 @@ public class OrderPickerController {
     public ResponseEntity<?> assignPicker(@RequestBody OrderPickerDto orderPickerDto){
         return orderPickerInfoService.assignPicker(orderPickerDto);
     }
+
+    @PostMapping("/assignPicker/container/{orderId}")
+    public ResponseEntity<?> assignPickerContainer(@RequestBody OrderPickerDto orderPickerDto){
+        return orderPickerInfoService.assignPickerContainer(orderPickerDto);
+    }
+
+    @PostMapping("/assign/box/{orderId}")
+    public ResponseEntity<?> assignBoxOrder(@RequestBody OrderPickerDto orderPickerDto){
+        return orderPickerInfoService.assignBoxOrder(orderPickerDto);
+    }
 }

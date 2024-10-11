@@ -14,5 +14,5 @@ import java.util.List;
 public class OrderPickerDto {
     private Integer orderId;
     private String pickerName;
-    private List<Containers> containersList;
+    private List<Containers> pickLists;
 }

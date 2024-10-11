@@ -4,12 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Containers {
-    private String id;
-    private List<ContainerProducts> productsList;
+public class ContainerProductListDto {
+    private String containerId;
+    private Integer productId;
+    private Integer quantity;
 }

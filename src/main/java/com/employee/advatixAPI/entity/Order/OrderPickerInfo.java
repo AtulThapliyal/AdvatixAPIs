@@ -31,4 +31,6 @@ public class OrderPickerInfo {
 
     private Integer productQty;
 
+    private String boxId;
+
 }
