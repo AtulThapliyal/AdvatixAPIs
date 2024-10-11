@@ -6,14 +6,17 @@ import com.employee.advatixAPI.dto.order.Containers;
 import com.employee.advatixAPI.dto.order.OrderPickerDto;
 import com.employee.advatixAPI.entity.Order.FEPOrderInfo;
 import com.employee.advatixAPI.entity.Order.OrderPickerInfo;
+import com.employee.advatixAPI.entity.warehouse.WarehouseContainers;
 import com.employee.advatixAPI.entity.warehouse.enums.Status;
 import com.employee.advatixAPI.exception.NotFoundException;
 import com.employee.advatixAPI.repository.Order.FEPOrderRepository;
 import com.employee.advatixAPI.repository.Order.OrderPickerInfoRepository;
+import com.employee.advatixAPI.repository.Warehouse.WarehouseContainerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.html.Option;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,6 +31,9 @@ public class OrderPickerInfoService {
     @Autowired
     FEPOrderRepository fepOrderRepository;
 
+
+    @Autowired
+    WarehouseContainerRepository warehouseContainerRepository;
 
     //saving only the picker not container
     public ResponseEntity<?> assignPicker(OrderPickerDto orderPickerDto) {
@@ -99,7 +105,25 @@ public class OrderPickerInfoService {
                     throw new NotFoundException("The quantity of product " + productId + " exceeds the order quantity");
                 }
 
-                productListDto.setContainerId(containers.getId());
+                //check if container exists by the given id
+                Optional<WarehouseContainers> warehouseContainers = warehouseContainerRepository.findByContainerId(containers.getId());
+
+                if (warehouseContainers.isPresent()) {
+                    //if yes then find that order number should be null  or can be same
+                    if (warehouseContainers.get().getOrderNumber() == null || warehouseContainers.get().getOrderNumber().equals(fepOrderInfo.getOrderNumber())) {
+                        productListDto.setContainerId(containers.getId());
+
+                        //in container table set the order id to let the warehouse picker know that container is assisgned to the order.
+                        warehouseContainers.get().setOrderNumber(fepOrderInfo.getOrderNumber());
+
+                        //save the order number to not make further use in another order.
+                        warehouseContainerRepository.save(warehouseContainers.get());
+                    } else {
+                        throw new NotFoundException("The container of Id " + containers.getId() + " has another order " + warehouseContainers.get().getOrderNumber());
+                    }
+                } else {
+                    throw new NotFoundException("The container of Id " + containers.getId() + " is not present.");
+                }
                 productListDto.setQuantity(currentQty);
                 productListDto.setProductId(productId);
 
@@ -114,8 +138,8 @@ public class OrderPickerInfoService {
         });
 
         containerProductListDtoList.forEach(containerProductListDto -> {
-                OrderPickerInfo orderPickerInfo = generateOrderPickerItems(orderPickerDto, fepOrderInfo, containerProductListDto);
-                orderPickerInfoRepository.save(orderPickerInfo);
+            OrderPickerInfo orderPickerInfo = generateOrderPickerItems(orderPickerDto, fepOrderInfo, containerProductListDto);
+            orderPickerInfoRepository.save(orderPickerInfo);
         });
 
         fepOrderInfo.setStatusId(3);
@@ -165,4 +189,9 @@ public class OrderPickerInfoService {
     }
 
 
+    public String getContainer() {
+//        warehouseContainerRepository.findF
+        WarehouseContainers warehouseContainers = warehouseContainerRepository.findFirstByOrderNumber(null);
+        return warehouseContainers.getContainerId();
+    }
 }

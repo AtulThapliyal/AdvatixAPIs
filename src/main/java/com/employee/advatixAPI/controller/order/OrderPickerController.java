@@ -28,4 +28,9 @@ public class OrderPickerController {
     public ResponseEntity<?> assignBoxOrder(@RequestBody OrderPickerDto orderPickerDto){
         return orderPickerInfoService.assignBoxOrder(orderPickerDto);
     }
+
+    @PostMapping("/get/container")
+    public String getContainer(){
+        return orderPickerInfoService.getContainer();
+    }
 }
