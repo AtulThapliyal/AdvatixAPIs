@@ -38,22 +38,18 @@ public class WarehouseBoxLabelService {
         }
 
         WarehouseBoxResponse warehouseBoxResponse = new WarehouseBoxResponse();
-        List<Integer> boxIds = new ArrayList<>();
+        List<String> boxIds = new ArrayList<>();
 
         for (int i = 0; i < warehouseBoxList.size(); i++) {
             WarehouseBox warehouseBox = warehouseBoxList.get(i);
             warehouseBox.setStatus(false);
 
 
-            boxIds.add(warehouseBox.getBoxId());
+            boxIds.add(warehouseBox.getBoxLabel());
             warehouseBoxLabelRepository.save(warehouseBox);
         }
 
-//        warehouseBoxList.forEach(box ->
-////        box.setStatus(false)
-//        boxIds.add(box.getBoxId())
-//        );
-        warehouseBoxResponse.setBoxIds(boxIds);
+        warehouseBoxResponse.setBoxLabels(boxIds);
 
         return ResponseEntity.ok(warehouseBoxResponse);
     }

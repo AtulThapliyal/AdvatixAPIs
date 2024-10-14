@@ -78,9 +78,12 @@ public class OrderService {
 
             cilOrder.setStatusId(0);
             cilOrder.setClientId(orderInfo.getClientId());
-            cilOrder.setCountryId(orderInfo.getCountryId());
-            cilOrder.setStateId(orderInfo.getStateId());
-            cilOrder.setCityId(orderInfo.getCityId());
+            cilOrder.setShipToCountryId(orderInfo.getCountryId());
+            cilOrder.setShipToStateId(orderInfo.getStateId());
+            cilOrder.setShipToCityId(orderInfo.getCityId());
+            cilOrder.setShipToAddress(orderInfo.getAddress1() + orderInfo.getAddress2());
+            cilOrder.setWarehouseId(orderInfo.getWarehouseId());
+            cilOrder.setShipToName(orderInfo.getShipToName());
 
             for (OrderListRequestDto cilOrderItem : orderInfo.getOrderItemsList()) {
                 CILOrderItems cilOrderItems = new CILOrderItems();
@@ -144,10 +147,14 @@ public class OrderService {
                     cilOrderInfoBackOrder.setOrderItemsList(orderItemsBackOrder);
 
                     cilOrderInfoBackOrder.setStatusId(18);
-                    cilOrderInfoBackOrder.setCountryId(orderInfo.getCountryId());
-                    cilOrderInfoBackOrder.setStateId(orderInfo.getStateId());
-                    cilOrderInfoBackOrder.setCityId(orderInfo.getCityId());
+                    cilOrderInfoBackOrder.setShipToCountryId(orderInfo.getCountryId());
+                    cilOrderInfoBackOrder.setShipToStateId(orderInfo.getStateId());
+                    cilOrderInfoBackOrder.setShipToCityId(orderInfo.getCityId());
                     cilOrderInfoBackOrder.setCarrierId(cilOrder.getCarrierId());
+                    cilOrderInfoBackOrder.setShipToAddress(orderInfo.getAddress1() + orderInfo.getAddress2());
+                    cilOrderInfoBackOrder.setWarehouseId(orderInfo.getWarehouseId());
+                    cilOrderInfoBackOrder.setShipToName(orderInfo.getShipToName());
+
 
                     if (carrierInfo.isPresent()) {
                         PartnerInfo partnerInfo = partnerRepository.findByPartnerId(carrierInfo.get().getPartnerId());
@@ -188,11 +195,13 @@ public class OrderService {
         List<FEPOrderItems> fepOrderItemsList = new ArrayList<>();
         fepOrderInfo.setClientId(orderInfo.getClientId());
         fepOrderInfo.setOrderId(orderInfo.getOrderId());
-        fepOrderInfo.setCityId(orderInfo.getCityId());
-        fepOrderInfo.setCountryId(orderInfo.getCountryId());
-        fepOrderInfo.setStateId(orderInfo.getStateId());
+        fepOrderInfo.setShipToCityId(orderInfo.getShipToCityId());
+        fepOrderInfo.setShipToCountryId(orderInfo.getShipToCountryId());
+        fepOrderInfo.setShipToStateId(orderInfo.getShipToStateId());
         fepOrderInfo.setStatusId(1);
         fepOrderInfo.setOrderNumber(orderInfo.getOrderNumber());
+        fepOrderInfo.setShipToAddress(orderInfo.getShipToAddress());
+        fepOrderInfo.setShipToName(orderInfo.getShipToName());
 
         for (int i = 0; i < orderItems.size(); i++) {
             CILOrderItems cilOrderItem = orderItems.get(i);

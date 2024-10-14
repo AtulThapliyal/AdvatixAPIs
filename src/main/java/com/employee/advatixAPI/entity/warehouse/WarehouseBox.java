@@ -21,5 +21,7 @@ public class WarehouseBox {
 
     private Integer warehouseId;
 
+    private String boxLabel;
+
 }
 

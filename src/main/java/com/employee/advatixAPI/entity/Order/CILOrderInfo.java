@@ -18,6 +18,8 @@ public class CILOrderInfo {
 
     private String reason;
 
+    private String shipToName;
+
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "order_id_fk", referencedColumnName = "order_id")
     private List<CILOrderItems> orderItemsList;
@@ -25,13 +27,17 @@ public class CILOrderInfo {
     private Integer statusId;
 
     //address fields
-    private Integer countryId;
-    private Integer stateId;
-    private Integer cityId;
+    private String shipToAddress;
+    private Integer shipToCountryId;
+    private Integer shipToStateId;
+    private Integer shipToCityId;
 
     private Integer carrierId;
     private String carrierName;
     private String serviceType;
 
     private String orderNumber;
+
+    private Integer warehouseId;
+
 }

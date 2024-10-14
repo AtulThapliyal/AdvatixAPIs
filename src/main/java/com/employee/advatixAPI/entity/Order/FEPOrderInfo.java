@@ -21,9 +21,11 @@ public class FEPOrderInfo {
     private List<FEPOrderItems> orderItemsList;
 
     //address
-    private Integer countryId;
-    private Integer stateId;
-    private Integer cityId;
+    private String shipToAddress;
+    private String shipToName;
+    private Integer shipToCountryId;
+    private Integer shipToStateId;
+    private Integer shipToCityId;
 
     private Integer carrierId;
     private String carrierName;

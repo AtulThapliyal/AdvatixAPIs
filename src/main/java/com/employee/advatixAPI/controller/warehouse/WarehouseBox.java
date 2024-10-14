@@ -4,10 +4,7 @@ import com.employee.advatixAPI.dto.warehouseBox.BoxRequest;
 import com.employee.advatixAPI.service.warehouse.WarehouseBoxLabelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/box/label")
@@ -19,4 +16,9 @@ public class WarehouseBox {
     public ResponseEntity<?> generateLabelList(@RequestBody BoxRequest boxRequest){
         return warehouseBoxLabelsService.generateLabelsLists(boxRequest);
     }
+
+//    @GetMapping("/getLabelInfo/{labelId}")
+//    public ResponseEntity<?> getOrderInfoByBoxLabel(@PathVariable Integer labelId){
+//
+//    }
 }
