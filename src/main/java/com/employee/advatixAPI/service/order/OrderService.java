@@ -107,7 +107,6 @@ public class OrderService {
 
             //checking the addresses like country city state
 
-
             if (clientInfo.getIsPartialAllowed()) {
                 CILOrderInfo cilOrderInfoBackOrder = new CILOrderInfo();
                 List<CILOrderItems> orderItemsBackOrder = new ArrayList<>();
@@ -213,14 +212,10 @@ public class OrderService {
         }
 
         fepOrderInfo.setOrderItemsList(fepOrderItemsList);
-
-
         fepOrderInfo.setCarrierId(orderInfo.getCarrierId());
         fepOrderInfo.setCarrierName(orderInfo.getCarrierName());
         fepOrderInfo.setServiceType(orderInfo.getServiceType());
         fepOrderRepository.save(fepOrderInfo);
-
-
     }
 
     public String generateOrderNumber(Integer orderId){
