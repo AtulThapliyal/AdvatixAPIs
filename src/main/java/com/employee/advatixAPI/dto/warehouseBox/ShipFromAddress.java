@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ShipFromAddress {
-    private String shipToName;
-    private String shipToAddress;
+    private String shipFromName;
+    private String shipFromAddress;
     private String city;
     private String state;
     private String country;

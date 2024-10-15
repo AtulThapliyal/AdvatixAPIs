@@ -1,8 +1,10 @@
 package com.employee.advatixAPI.controller.warehouse;
 
 import com.employee.advatixAPI.dto.warehouseBox.BoxRequest;
+import com.employee.advatixAPI.exception.NotFoundException;
 import com.employee.advatixAPI.service.warehouse.WarehouseBoxLabelService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,8 +19,13 @@ public class WarehouseBox {
         return warehouseBoxLabelsService.generateLabelsLists(boxRequest);
     }
 
-//    @GetMapping("/getLabelInfo/{labelId}")
-//    public ResponseEntity<?> getOrderInfoByBoxLabel(@PathVariable Integer labelId){
-//
-//    }
+    @GetMapping("/getLabelInfo/{labelId}")
+    public ResponseEntity<?> getOrderInfoByBoxLabel(@PathVariable String labelId){
+        try{
+            return warehouseBoxLabelsService.getByBoxLabel(labelId);
+
+        }catch (NotFoundException e){
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND) ;
+        }
+    }
 }

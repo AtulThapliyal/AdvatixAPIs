@@ -40,7 +40,7 @@ public class ClientService {
         Optional<ClientInfo> clientInfo = clientRepository.getClientByClientId(clientId);
         if (clientInfo.isPresent()){
             Country country = countryRepository.getCountryByCountryId(clientInfo.get().getCountryId());
-            States state = stateRepository.getStateByStateIdAndCountryId(clientInfo.get().getStateId(),country.getCountryId());
+            States state = stateRepository.getStatesByStateIdAndCountryId(clientInfo.get().getStateId(),country.getCountryId());
             City city = cityRepository.getCityByStateIdAndCountryId(state.getStateId(), country.getCountryId());
 
             clientResponse.setClient(clientInfo.get());

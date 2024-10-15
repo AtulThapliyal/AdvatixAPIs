@@ -199,6 +199,7 @@ public class OrderService {
         fepOrderInfo.setShipToCountryId(orderInfo.getShipToCountryId());
         fepOrderInfo.setShipToStateId(orderInfo.getShipToStateId());
         fepOrderInfo.setStatusId(1);
+        fepOrderInfo.setWarehouseId(orderInfo.getWarehouseId());
         fepOrderInfo.setOrderNumber(orderInfo.getOrderNumber());
         fepOrderInfo.setShipToAddress(orderInfo.getShipToAddress());
         fepOrderInfo.setShipToName(orderInfo.getShipToName());
@@ -227,7 +228,7 @@ public class OrderService {
     }
 
     public String generateSplitOrderNumber(Integer orderId){
-        return "ORDER"+orderId+"s1";
+        return "ORDER"+orderId+"S1";
     }
 
     public ResponseEntity<?> getOrderDetails(String orderNumber) {
