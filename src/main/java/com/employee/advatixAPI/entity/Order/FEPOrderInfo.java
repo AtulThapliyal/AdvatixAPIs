@@ -35,5 +35,14 @@ public class FEPOrderInfo {
     private Integer statusId;
 
     private String orderNumber;
+
+    private Long totalWeight;
+    private Long totalQuantity;
+
+    private String postalCode;
+    private String phone;
+    private String email;
+    private Boolean isResidential;
+
 }
 

@@ -20,10 +20,9 @@ public class WarehouseBox {
     }
 
     @GetMapping("/getLabelInfo/{labelId}")
-    public ResponseEntity<?> getOrderInfoByBoxLabel(@PathVariable String labelId){
+    public ResponseEntity<?> getOrderInfoByBoxLabel(@PathVariable("labelId") String labelId){
         try{
             return warehouseBoxLabelsService.getByBoxLabel(labelId);
-
         }catch (NotFoundException e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND) ;
         }

@@ -16,7 +16,9 @@ public class OrderRequestDto {
     private Integer stateId;
     private Integer cityId;
     private String address1;
-    private String address2;
-
+    private String postalCode;
+    private String phoneNumber;
+    private String emailAddress;
+    private Boolean isResidential;
     private Integer warehouseId;
 }
