@@ -23,7 +23,6 @@ public class OrderController {
     public ResponseEntity<?> generateOrder(@RequestBody OrderRequestDto orderRequestDto){
         return orderService.createOrder(orderRequestDto);
     }
-
     @GetMapping("/getOrderDetails/{orderNumber}")
     public ResponseEntity<?> getOrderDetails(@PathVariable String orderNumber){
         return orderService.getOrderDetails(orderNumber);
