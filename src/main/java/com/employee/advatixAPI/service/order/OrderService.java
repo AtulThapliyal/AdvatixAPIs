@@ -81,9 +81,13 @@ public class OrderService {
             cilOrder.setShipToCountryId(orderInfo.getCountryId());
             cilOrder.setShipToStateId(orderInfo.getStateId());
             cilOrder.setShipToCityId(orderInfo.getCityId());
-            cilOrder.setShipToAddress(orderInfo.getAddress1() + orderInfo.getAddress2());
+            cilOrder.setShipToAddress(orderInfo.getAddress1());
             cilOrder.setWarehouseId(orderInfo.getWarehouseId());
             cilOrder.setShipToName(orderInfo.getShipToName());
+            cilOrder.setPostalCode(orderInfo.getPostalCode());
+            cilOrder.setPhoneNumber(orderInfo.getPhoneNumber());
+            cilOrder.setIsResidential(orderInfo.getIsResidential());
+            cilOrder.setEmailAddress(orderInfo.getEmailAddress());
 
             for (OrderListRequestDto cilOrderItem : orderInfo.getOrderItemsList()) {
                 CILOrderItems cilOrderItems = new CILOrderItems();
@@ -150,9 +154,13 @@ public class OrderService {
                     cilOrderInfoBackOrder.setShipToStateId(orderInfo.getStateId());
                     cilOrderInfoBackOrder.setShipToCityId(orderInfo.getCityId());
                     cilOrderInfoBackOrder.setCarrierId(cilOrder.getCarrierId());
-                    cilOrderInfoBackOrder.setShipToAddress(orderInfo.getAddress1() + orderInfo.getAddress2());
+                    cilOrderInfoBackOrder.setShipToAddress(orderInfo.getAddress1());
                     cilOrderInfoBackOrder.setWarehouseId(orderInfo.getWarehouseId());
                     cilOrderInfoBackOrder.setShipToName(orderInfo.getShipToName());
+                    cilOrderInfoBackOrder.setPostalCode(orderInfo.getPostalCode());
+                    cilOrderInfoBackOrder.setPhoneNumber(orderInfo.getPhoneNumber());
+                    cilOrderInfoBackOrder.setIsResidential(orderInfo.getIsResidential());
+                    cilOrderInfoBackOrder.setEmailAddress(orderInfo.getEmailAddress());
 
 
                     if (carrierInfo.isPresent()) {
@@ -202,6 +210,11 @@ public class OrderService {
         fepOrderInfo.setOrderNumber(orderInfo.getOrderNumber());
         fepOrderInfo.setShipToAddress(orderInfo.getShipToAddress());
         fepOrderInfo.setShipToName(orderInfo.getShipToName());
+        fepOrderInfo.setPostalCode(orderInfo.getPostalCode());
+        fepOrderInfo.setEmail(orderInfo.getEmailAddress());
+        fepOrderInfo.setIsResidential(orderInfo.getIsResidential());
+        fepOrderInfo.setPhone(orderInfo.getPhoneNumber());
+
 
         for (int i = 0; i < orderItems.size(); i++) {
             CILOrderItems cilOrderItem = orderItems.get(i);

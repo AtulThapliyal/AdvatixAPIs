@@ -13,4 +13,8 @@ public class ShipToAddress {
     private String city;
     private String state;
     private String country;
+    private String phoneNumber;
+    private String emailId;
+    private Boolean isResidential;
+    private String postalCode;
 }

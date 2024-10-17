@@ -39,5 +39,9 @@ public class CILOrderInfo {
     private String orderNumber;
 
     private Integer warehouseId;
+    private String postalCode;
+    private String phoneNumber;
+    private String emailAddress;
+    private Boolean isResidential;
 
 }

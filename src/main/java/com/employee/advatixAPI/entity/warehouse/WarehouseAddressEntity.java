@@ -28,4 +28,9 @@ public class WarehouseAddressEntity {
 
     private Integer stateId;
 
+    private String phoneNumber;
+    private String emailId;
+    private Boolean isResidential;
+    private String postalCode;
+
 }
