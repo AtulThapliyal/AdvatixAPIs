@@ -10,9 +10,9 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ShipmentResponseDto {
-    private Long shipmentId;
-    private Long rateId;
-    private String shipmentTrackingNumber;
+    private Long shipment_id;
+    private Long rate_id;
+    private String shipment_tracking_number;
     private String confirmation;
     private List<LabelDTO> labels;
 }

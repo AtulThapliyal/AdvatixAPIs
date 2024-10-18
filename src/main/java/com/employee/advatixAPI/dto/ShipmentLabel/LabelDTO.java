@@ -9,10 +9,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class LabelDTO {
     private Long id;
-    private String labelUrl;
+    private String label_url;
     private Double cost;
-    private String finalMileCarrier;
-    private String trackingUrl;
-    private String trackingNumber;
-    private String labelFormat;
+    private String final_mile_carrier;
+    private String tracking_url;
+    private String tracking_number;
+    private String label_format;
 }

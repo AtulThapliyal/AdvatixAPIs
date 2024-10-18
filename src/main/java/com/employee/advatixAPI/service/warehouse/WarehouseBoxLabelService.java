@@ -207,31 +207,28 @@ public class WarehouseBoxLabelService {
         ShippingAddress shippingAddress = generateShippingToAddress(boxLabelResponseResponseEntity.getBody().getShipToAddress());
         ShippingAddress shipperAddress = generateShippingAddress(boxLabelResponseResponseEntity.getBody().getShipFromAddress());
 
-        List<BoxEntity> entity = boxLabelRepository.findAllByOrderNumber(boxRequest.getOrderNumber());
-        entity.forEach(element -> {
-            ParcelDTO parcelDTO = new ParcelDTO();
-            DimensionsDTO dimensionsDTO = new DimensionsDTO();
-            WeightDTO weightDTO = new WeightDTO();
+        ParcelDTO parcelDTO = new ParcelDTO();
+        DimensionsDTO dimensionsDTO = new DimensionsDTO();
+        WeightDTO weightDTO = new WeightDTO();
 
-            dimensionsDTO.setHeight(element.getHeight());
-            dimensionsDTO.setLength(element.getLength());
-            dimensionsDTO.setWidth(element.getWidth());
+        dimensionsDTO.setHeight(boxRequest.getDimensions().getHeight());
+        dimensionsDTO.setLength(boxRequest.getDimensions().getLength());
+        dimensionsDTO.setWidth(boxRequest.getDimensions().getWidth());
 
-            weightDTO.setValue(element.getBoxWeight());
-            weightDTO.setUnit("Ounce");
+        weightDTO.setValue(boxRequest.getBoxWeight());
+        weightDTO.setUnit("Ounce");
 
-            parcelDTO.setDimensions(dimensionsDTO);
-            parcelDTO.setWeight(weightDTO);
+        parcelDTO.setDimensions(dimensionsDTO);
+        parcelDTO.setWeight(weightDTO);
 
-            parcesList.add(parcelDTO);
-        });
+        parcesList.add(parcelDTO);
 
         shipmentDTO.setAddress_to(shippingAddress);
         shipmentDTO.setAddress_from(shipperAddress);
         shipmentDTO.setParcels(parcesList);
 
         shipmentRequestDto.setShipment(shipmentDTO);
-            System.out.println(shipmentRequestDto);
+        System.out.println(shipmentRequestDto);
 
         try {
             return new ResponseEntity<>(generateShipmentLabel(shipmentRequestDto), HttpStatus.OK);
@@ -248,7 +245,7 @@ public class WarehouseBoxLabelService {
         shippingAddress.setCompany("");
         shippingAddress.setEmail(shipToAddress.getEmailId());
         shippingAddress.setPostal_code(shipToAddress.getPostalCode());
-        shippingAddress.setPhone(shipToAddress.getPhoneNumber().toString());
+        shippingAddress.setPhone(shipToAddress.getPhoneNumber());
         shippingAddress.setStreet2("");
         shippingAddress.setCountry(shipToAddress.getCountry());
         shippingAddress.setCity(shipToAddress.getCity());
@@ -265,7 +262,7 @@ public class WarehouseBoxLabelService {
         shippingAddress.setCompany(shipFromAddress.getShipFromName());
         shippingAddress.setEmail(shipFromAddress.getEmailId());
         shippingAddress.setPostal_code(shipFromAddress.getPostalCode());
-        shippingAddress.setPhone(shipFromAddress.getPhoneNumber().toString());
+        shippingAddress.setPhone(shipFromAddress.getPhoneNumber());
         shippingAddress.setCountry(shipFromAddress.getCountry());
         shippingAddress.setCity(shipFromAddress.getCity());
         shippingAddress.setState(shipFromAddress.getState());
@@ -276,7 +273,7 @@ public class WarehouseBoxLabelService {
     }
 
 
-    private String generateShipmentLabel(ShipmentRequestDto shipmentRequest) throws URISyntaxException {
+    private ShipmentResponseDto generateShipmentLabel(ShipmentRequestDto shipmentRequest) throws URISyntaxException {
         URI uri = new URI("https://apisandbox.tusklogistics.com/v1/labels");
         RestTemplate restTemplate = new RestTemplate();
 
@@ -287,7 +284,7 @@ public class WarehouseBoxLabelService {
 
         HttpEntity<ShipmentRequestDto> httpEntity = new HttpEntity<>(shipmentRequest, headers);
 
-        ResponseEntity<String> result = restTemplate.postForEntity(uri, httpEntity, String.class);
+        ResponseEntity<ShipmentResponseDto> result = restTemplate.postForEntity(uri, httpEntity, ShipmentResponseDto.class);
         System.out.println(result.getBody());
         return result.getBody();
     }
