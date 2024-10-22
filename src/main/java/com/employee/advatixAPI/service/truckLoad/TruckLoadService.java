@@ -4,7 +4,8 @@ import com.employee.advatixAPI.dto.truckLoad.GetOrdersRTS;
 import com.employee.advatixAPI.dto.truckLoad.OrderShipmentRequest;
 import com.employee.advatixAPI.entity.Order.FEPOrderInfo;
 import com.employee.advatixAPI.entity.Order.FEPOrderStatus;
-import com.employee.advatixAPI.entity.rooms.CarrierRooms;
+import com.employee.advatixAPI.entity.Carrier.CarrierRooms;
+import com.employee.advatixAPI.exception.NotFoundException;
 import com.employee.advatixAPI.repository.Order.FEPOrderRepository;
 import com.employee.advatixAPI.repository.Order.OrderStatusRepository;
 import com.employee.advatixAPI.repository.carrier.CarrierRoomsRepository;
@@ -62,12 +63,14 @@ public class TruckLoadService {
             Optional<CarrierRooms> carrierRooms = carrierRoomsRepository.findByRoomId(orderShipmentRequest.getRoomId());
             if (carrierRooms.isPresent()) {
                 if(orderInfo.get().getCarrierId().equals(carrierRooms.get().getCarrierId())){
+                    orderInfo.get().setStatusId(7);
+                    fepOrderRepository.save(orderInfo.get());
                     return "Order is Shipped successfully";
                 }
                 return "The order number " + orderShipmentRequest.getOrderNumber() +" does not belong to this carrier";
             }
             return "Not Found with Room Number" + orderShipmentRequest.getRoomId();
         }
-        return "Not Found with order Number" + orderShipmentRequest.getOrderNumber();
+        throw new NotFoundException( "Not Found with order Number" + orderShipmentRequest.getOrderNumber());
     }
 }

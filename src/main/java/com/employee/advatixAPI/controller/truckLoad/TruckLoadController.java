@@ -33,7 +33,6 @@ public class TruckLoadController {
     public ResponseEntity<?> loadAllOrders(@RequestBody OrderShipmentRequest orderShipmentRequest) {
         try {
             String added =  truckLoadService.addOrderInTruck(orderShipmentRequest);
-
             return ResponseEntity.ok(added);
         } catch (NotFoundException e) {
             throw new NotFoundException(e.getMessage());
