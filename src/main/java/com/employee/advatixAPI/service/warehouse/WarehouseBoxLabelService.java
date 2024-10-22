@@ -231,6 +231,9 @@ public class WarehouseBoxLabelService {
         System.out.println(shipmentRequestDto);
 
         try {
+            FEPOrderInfo fepOrderInfo = fepOrderRepository.findByOrderNumber(boxRequest.getOrderNumber()).orElseThrow(() -> new NotFoundException("No id found with " + boxRequest.getOrderNumber()));
+            fepOrderInfo.setStatusId(6);
+            fepOrderRepository.save(fepOrderInfo);
             return new ResponseEntity<>(generateShipmentLabel(shipmentRequestDto), HttpStatus.OK);
         } catch (Exception e) {
             System.out.println(e);
@@ -252,7 +255,6 @@ public class WarehouseBoxLabelService {
         shippingAddress.setState(shipToAddress.getState());
         shippingAddress.setIs_residential(shipToAddress.getIsResidential());
         shippingAddress.setStreet1(shipToAddress.getShipToAddress());
-        ;
         return shippingAddress;
     }
 
@@ -277,7 +279,6 @@ public class WarehouseBoxLabelService {
         URI uri = new URI("https://apisandbox.tusklogistics.com/v1/labels");
         RestTemplate restTemplate = new RestTemplate();
 
-        ShipmentResponseDto shipmentResponseDto = new ShipmentResponseDto();
         HttpHeaders headers = new HttpHeaders();
         headers.set("content-type", "application/json");
         headers.set("x-api-key", "7Du28nKx66p6PloG9iGz9Vbg9PZINZCuIUXdahH5");

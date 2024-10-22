@@ -13,5 +13,6 @@ import java.util.List;
 @NoArgsConstructor
 public class OrderDetailsDto {
     private String orderNumber;
+    private String orderStatus;
     private List<FEPOrderItems> productDetails;
 }
