@@ -1,4 +1,4 @@
-package com.employee.advatixAPI.dto.warehouseBox;
+package com.employee.advatixAPI.dto.warehouse;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

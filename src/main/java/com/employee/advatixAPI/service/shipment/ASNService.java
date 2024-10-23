@@ -40,7 +40,6 @@ public class ASNService {
 
     public ASNNotice addASN(ASNNoticeRequestDto asnNoticeRequest) {
         ASNNotice asnNotice = new ASNNotice();
-//        WarehouseReceivedItems warehouseReceivedItems = new WarehouseReceivedItems();
 
         asnNotice.setPoNumber(asnNoticeRequest.getPoNumber());
         asnNotice.setLotNumber(asnNoticeRequest.getLotNumber());
@@ -53,32 +52,10 @@ public class ASNService {
         for (ASNUnitRequest asnUnit : asnNoticeRequest.getAsnUnitList()) {
             ASNUnits unit = new ASNUnits(asnUnit.getQuantity(), asnUnit.getReceivedQuantity(), asnUnit.getLocation(), productRepository.findByProductId(asnUnit.getProductId()).get());
             asnUnitsList.add(unit);
-
-            Optional<WarehouseReceivedItems> receivedItem = warehouseRepository.findWarehouseReceivedItemsByProductId(unit.getProduct().getProductId());
-
-            if(receivedItem.isPresent()){
-                receivedItem.get().setQuantity(receivedItem.get().getQuantity() + unit.getReceivedQty());
-            }else {
-                WarehouseReceivedItems warehouseReceivedItems = new WarehouseReceivedItems();
-
-                warehouseReceivedItems.setWarehouseId(asnNoticeRequest.getWarehouseId());
-                warehouseReceivedItems.setLocation(asnUnit.getLocation());
-                warehouseReceivedItems.setClientId(unit.getProduct().getClientId());
-                warehouseReceivedItems.setEmployeeId(asnNoticeRequest.getCreatedBy());
-                warehouseReceivedItems.setQuantity(asnUnit.getReceivedQuantity());
-                warehouseReceivedItems.setProductId(asnUnit.getProductId());
-                warehouseReceivedItems.setCreatedOn(LocalDate.now());
-                warehouseReceivedItems.setLotNumber(asnNoticeRequest.getLotNumber());
-                warehouseReceivedItems.setInventoryStage(InventoryStage.ON_HAND);
-                warehouseReceivedItems.setReceiveStatus(ReceiveStatus.RECEIVED);
-
-                warehouseRepository.save(warehouseReceivedItems);
-
-            }
         }
         asnNotice.setAsnUnitsList(asnUnitsList);  // set the saved ASNNotice with its units
-        ASNNotice savedNotice = asnNoticeRepository.save(asnNotice);  // Save ASNNotice to return
+        // Save ASNNotice to return
 
-        return savedNotice;
+        return asnNoticeRepository.save(asnNotice);
     }
 }

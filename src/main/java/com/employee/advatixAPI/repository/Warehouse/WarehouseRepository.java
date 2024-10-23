@@ -1,6 +1,7 @@
 package com.employee.advatixAPI.repository.Warehouse;
 
 import com.employee.advatixAPI.entity.warehouse.WarehouseReceivedItems;
+import com.employee.advatixAPI.entity.warehouse.enums.InventoryStage;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -25,4 +26,6 @@ public interface WarehouseRepository extends JpaRepository<WarehouseReceivedItem
     Optional<WarehouseReceivedItems> findWarehouseReceivedItemsByProductId(Integer productId);
 
     Optional<List<WarehouseReceivedItems>> findAllByClientIdAndProductIdIn(Integer clientId, List<Integer> productIds);
+
+    Optional<WarehouseReceivedItems> findByWarehouseIdAndClientIdAndProductIdAndInventoryStageAndLocation(Integer warehouseId, Integer clientId, Integer productId, InventoryStage inventoryStage, String id);
 }

@@ -1,6 +1,6 @@
 package com.employee.advatixAPI.controller.warehouse;
 
-import com.employee.advatixAPI.dto.warehouseBox.BoxRequest;
+import com.employee.advatixAPI.dto.warehouse.BoxRequest;
 import com.employee.advatixAPI.exception.NotFoundException;
 import com.employee.advatixAPI.service.warehouse.WarehouseBoxLabelService;
 import org.springframework.beans.factory.annotation.Autowired;

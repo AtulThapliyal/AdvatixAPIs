@@ -1,4 +1,4 @@
-package com.employee.advatixAPI.dto.warehouseBox;
+package com.employee.advatixAPI.dto.warehouse;
 
 import com.employee.advatixAPI.entity.warehouse.enums.BoxType;
 import lombok.AllArgsConstructor;

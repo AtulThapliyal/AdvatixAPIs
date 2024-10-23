@@ -1,7 +1,5 @@
 package com.employee.advatixAPI.dto.ShipmentLabel;
 
-import com.employee.advatixAPI.dto.warehouseBox.ShipFromAddress;
-import com.employee.advatixAPI.dto.warehouseBox.ShipToAddress;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

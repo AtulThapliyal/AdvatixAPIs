@@ -1,7 +1,7 @@
 package com.employee.advatixAPI.service.warehouse;
 
 import com.employee.advatixAPI.dto.ShipmentLabel.*;
-import com.employee.advatixAPI.dto.warehouseBox.*;
+import com.employee.advatixAPI.dto.warehouse.*;
 import com.employee.advatixAPI.entity.Address.City;
 import com.employee.advatixAPI.entity.Address.Country;
 import com.employee.advatixAPI.entity.Address.States;
