@@ -1,22 +1,18 @@
 package com.employee.advatixAPI.service.Lpn.LpnService;
 
-import com.employee.advatixAPI.dto.Lpn.LicensePlateNumberRequest;
-import com.employee.advatixAPI.dto.Lpn.LpnOrders;
+import com.employee.advatixAPI.dto.truckLoad.LicensePlateNumberRequest;
+import com.employee.advatixAPI.dto.truckLoad.LpnOrders;
 import com.employee.advatixAPI.entity.lpn.LpnInfo;
 import com.employee.advatixAPI.entity.lpn.OrderLpnInfo;
-import com.employee.advatixAPI.entity.warehouse.Warehouse;
 import com.employee.advatixAPI.entity.warehouse.WarehouseAddressEntity;
 import com.employee.advatixAPI.repository.Lpn.LpnInfoRepository;
 import com.employee.advatixAPI.repository.Lpn.LpnOrderRespository;
 import com.employee.advatixAPI.repository.Warehouse.WarehouseAddressRepository;
-import com.employee.advatixAPI.repository.Warehouse.WhRepository;
 import com.employee.advatixAPI.repository.partner.PartnerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Optional;
 

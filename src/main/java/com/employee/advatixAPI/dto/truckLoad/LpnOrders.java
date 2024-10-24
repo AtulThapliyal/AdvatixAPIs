@@ -1,6 +1,5 @@
-package com.employee.advatixAPI.dto.Lpn;
+package com.employee.advatixAPI.dto.truckLoad;
 
-import com.employee.advatixAPI.entity.Order.FEPOrderInfo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

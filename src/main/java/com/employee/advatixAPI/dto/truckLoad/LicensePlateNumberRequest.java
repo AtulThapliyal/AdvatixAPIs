@@ -1,6 +1,5 @@
-package com.employee.advatixAPI.dto.Lpn;
+package com.employee.advatixAPI.dto.truckLoad;
 
-import jakarta.persistence.Access;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
