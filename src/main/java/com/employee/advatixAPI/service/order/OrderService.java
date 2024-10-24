@@ -253,5 +253,77 @@ public class OrderService {
            throw new NotFoundException("The Order number does not exist" + orderNumber);
        }
     }
+
+    public ResponseEntity<?> createNewOrder(OrderRequestDto orderInfo) {
+        List<Integer> productIds = new ArrayList<>();
+
+        orderInfo.getOrderItemsList().forEach(a -> productIds.add(a.getProductId()));
+
+        Optional<List<WarehouseReceivedItems>> warehouseReceivedItems = warehouseRepository.findAllByClientIdAndProductIdIn(orderInfo.getClientId(), productIds);
+        HashMap<Integer, WarehouseReceivedItems> itemsHashMap = new HashMap<>();
+
+
+        CILOrderInfo cilOrder = new CILOrderInfo();
+
+        if (warehouseReceivedItems.isPresent()) {
+            warehouseReceivedItems.get().forEach(item -> itemsHashMap.put(item.getProductId(), item));
+
+            ClientInfo clientInfo = clientRepository.findById(orderInfo.getClientId()).get();
+
+            Optional<ClientCarrierInfo> carrierInfo = clientCarrierRepository.findByClientId(clientInfo.getClientId());
+            List<CILOrderItems> orderItems = new ArrayList<>();
+
+            cilOrder.setStatusId(0);
+            cilOrder.setClientId(orderInfo.getClientId());
+            cilOrder.setShipToCountryId(orderInfo.getCountryId());
+            cilOrder.setShipToStateId(orderInfo.getStateId());
+            cilOrder.setShipToCityId(orderInfo.getCityId());
+            cilOrder.setShipToAddress(orderInfo.getAddress1());
+            cilOrder.setWarehouseId(orderInfo.getWarehouseId());
+            cilOrder.setShipToName(orderInfo.getShipToName());
+            cilOrder.setPostalCode(orderInfo.getPostalCode());
+            cilOrder.setPhoneNumber(orderInfo.getPhoneNumber());
+            cilOrder.setIsResidential(orderInfo.getIsResidential());
+            cilOrder.setEmailAddress(orderInfo.getEmailAddress());
+
+            for (OrderListRequestDto cilOrderItem : orderInfo.getOrderItemsList()) {
+                CILOrderItems cilOrderItems = new CILOrderItems();
+                cilOrderItems.setProductId(cilOrderItem.getProductId());
+                cilOrderItems.setProductQty(cilOrderItem.getProductQty());
+
+                orderItems.add(cilOrderItems);
+            }
+            cilOrder.setOrderItemsList(orderItems);
+
+            if (carrierInfo.isPresent()) {
+                PartnerInfo partnerInfo = partnerRepository.findByPartnerId(carrierInfo.get().getPartnerId());
+                cilOrder.setCarrierId(carrierInfo.get().getPartnerId());
+                cilOrder.setCarrierName(partnerInfo.getPartnerName());
+                cilOrder.setServiceType(partnerInfo.getServiceType());
+            }
+
+            CILOrderInfo orderInformation = cilOrderRepository.save(cilOrder);
+
+            orderInformation.setOrderNumber(generateOrderNumber(orderInformation.getOrderId()));
+
+            //checking the addresses like country city state
+
+//            else {
+                for (OrderListRequestDto cilOrderItem : orderInfo.getOrderItemsList()) {
+                    if (cilOrderItem.getProductQty() <= 0) {
+                        throw new NotFoundException("Product with id  " + cilOrderItem.getProductId() + "can not be zero.");
+                    } else if (cilOrderItem.getProductQty() > itemsHashMap.get(cilOrderItem.getProductId()).getQuantity()) {
+                        orderInformation.setReason("The order can not be completed due to unavailability of products.");
+                        return ResponseEntity.ok(orderInformation);
+                    }
+                    saveInFEP(cilOrder, orderItems, itemsHashMap);
+//                }
+            }
+        } else {
+            throw new NotFoundException("This id does not belong to this client");
+        }
+
+        return null;
+    }
 }
 
