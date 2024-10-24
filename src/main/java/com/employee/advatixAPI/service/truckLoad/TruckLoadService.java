@@ -1,11 +1,17 @@
 package com.employee.advatixAPI.service.truckLoad;
 
 import com.employee.advatixAPI.dto.truckLoad.GetOrdersRTS;
+import com.employee.advatixAPI.dto.truckLoad.LpnOrders;
 import com.employee.advatixAPI.dto.truckLoad.OrderShipmentRequest;
 import com.employee.advatixAPI.entity.Order.FEPOrderInfo;
 import com.employee.advatixAPI.entity.Order.FEPOrderStatus;
 import com.employee.advatixAPI.entity.Carrier.CarrierRooms;
+import com.employee.advatixAPI.entity.lpn.OrderLpnInfo;
+import com.employee.advatixAPI.entity.manifest.ManifestInfo;
+import com.employee.advatixAPI.entity.manifest.ManifestMapping;
 import com.employee.advatixAPI.exception.NotFoundException;
+import com.employee.advatixAPI.repository.Lpn.LpnOrderRespository;
+import com.employee.advatixAPI.repository.Lpn.ManifestRepository;
 import com.employee.advatixAPI.repository.Order.FEPOrderRepository;
 import com.employee.advatixAPI.repository.Order.OrderStatusRepository;
 import com.employee.advatixAPI.repository.carrier.CarrierRoomsRepository;
@@ -28,6 +34,12 @@ public class TruckLoadService {
 
     @Autowired
     CarrierRoomsRepository carrierRoomsRepository;
+
+    @Autowired
+    LpnOrderRespository orderLpnInfoRepository;
+
+    @Autowired
+    ManifestRepository manifestRepository;
 
 
     public List<GetOrdersRTS> getAllOrdersForLoad() {
@@ -58,19 +70,53 @@ public class TruckLoadService {
 
     public String addOrderInTruck(OrderShipmentRequest orderShipmentRequest) {
 
-        Optional<FEPOrderInfo> orderInfo = fepOrderRepository.findByOrderNumber(orderShipmentRequest.getOrderNumber());
-        if (orderInfo.isPresent()) {
-            Optional<CarrierRooms> carrierRooms = carrierRoomsRepository.findByRoomId(orderShipmentRequest.getRoomId());
-            if (carrierRooms.isPresent()) {
-                if(orderInfo.get().getCarrierId().equals(carrierRooms.get().getCarrierId())){
-                    orderInfo.get().setStatusId(7);
-                    fepOrderRepository.save(orderInfo.get());
-                    return "Order is Shipped successfully";
+        switch (orderShipmentRequest.getType()) {
+            case "Order":
+                Optional<FEPOrderInfo> orderInfo = fepOrderRepository.findByOrderNumber(orderShipmentRequest.getNumber());
+                if (orderInfo.isPresent()) {
+                    Optional<CarrierRooms> carrierRooms = carrierRoomsRepository.findByRoomId(orderShipmentRequest.getRoomId());
+                    if (carrierRooms.isPresent()) {
+                        if (orderInfo.get().getCarrierId().equals(carrierRooms.get().getCarrierId())) {
+                            orderInfo.get().setStatusId(7);
+                            fepOrderRepository.save(orderInfo.get());
+                            return "Order is Shipped successfully";
+                        }
+                        return "The order number " + orderShipmentRequest.getNumber() + " does not belong to this carrier";
+                    }
+                    return "Not Found with Room Number" + orderShipmentRequest.getRoomId();
                 }
-                return "The order number " + orderShipmentRequest.getOrderNumber() +" does not belong to this carrier";
-            }
-            return "Not Found with Room Number" + orderShipmentRequest.getRoomId();
+                throw new NotFoundException("Not Found with order Number" + orderShipmentRequest.getNumber());
+            case "Lpn":
+                Optional<List<OrderLpnInfo>> lpnOrders = orderLpnInfoRepository.findAllByLpnNumber(orderShipmentRequest.getNumber());
+
+                lpnOrders.ifPresent(orderLpnInfos -> orderLpnInfos.forEach(lpnOrder -> {
+                    Optional<FEPOrderInfo> order = fepOrderRepository.findByOrderNumber(lpnOrder.getOrderNumber());
+
+                    order.get().setStatusId(7);
+                    fepOrderRepository.save(order.get());
+                }));
+            case "Manifest":
+                Optional<List<ManifestMapping>> manifestInfo = manifestRepository.findAllByManifestNumber(orderShipmentRequest.getNumber());
+                manifestInfo.get().forEach(manifest -> {
+                    if (manifest.getOrderNumber() != null) {
+                        Optional<FEPOrderInfo> orderInformation = fepOrderRepository.findByOrderNumber(orderShipmentRequest.getNumber());
+                        orderInformation.get().setStatusId(7);
+                        fepOrderRepository.save(orderInformation.get());
+                    }
+
+                    if (manifest.getLpnNumber() != null) {
+                        Optional<List<OrderLpnInfo>> lpns = orderLpnInfoRepository.findAllByLpnNumber(manifest.getLpnNumber());
+
+                        lpns.ifPresent(orderLpnInfos -> orderLpnInfos.forEach(lpnOrder -> {
+                            Optional<FEPOrderInfo> order = fepOrderRepository.findByOrderNumber(lpnOrder.getOrderNumber());
+
+                            order.get().setStatusId(7);
+                            fepOrderRepository.save(order.get());
+                        }));
+                    }
+                });
         }
-        throw new NotFoundException( "Not Found with order Number" + orderShipmentRequest.getOrderNumber());
+
+        return "Done";
     }
 }

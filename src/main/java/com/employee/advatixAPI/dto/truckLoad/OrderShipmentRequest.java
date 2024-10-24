@@ -8,7 +8,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class OrderShipmentRequest {
-    private String orderNumber;
+    private String number;
 
     private Integer roomId;
+
+    private String type;
 }
